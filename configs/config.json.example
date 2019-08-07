@@ -1,0 +1,9 @@
+{
+  "ListenIp": "127.0.0.1",
+  "ListenPort": 7020,
+  "SentryUrl": "",
+  "DatabaseName":"",
+  "DatabaseUsername": "",
+  "DatabasePassword": "",
+  "LogLevel": 1
+}

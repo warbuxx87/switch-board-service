@@ -8,11 +8,15 @@ import (
 )
 
 type Configuration struct {
-	ListenIp   string
 
+	ListenIp   string
 	ListenPort int
 
 	SentryUrl string
+
+	DatabaseName string
+	DatabaseUsername string
+	DatabasePassword string
 
 	// 0 = Info, 1 = Debug
 	LogLevel int
