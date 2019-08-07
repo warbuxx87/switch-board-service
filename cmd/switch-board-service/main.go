@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/api"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/models"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/views"
@@ -93,7 +94,6 @@ func main() {
 			}
 		})
 
-
 		e.Static("/static", "assets")
 
 		e.Use(session.Middleware(sessions.NewCookieStore([]byte("herpderp"))))
@@ -115,8 +115,9 @@ func main() {
 		e.GET("/", views.RedirectView)
 		e.GET("/login", views.LoginView)
 		e.GET("/dashboard", views.DashboardView)
-		e.GET("/action/logout", views.LogoutAction)
-		e.POST("/action/login", views.LoginAction)
+
+		e.GET("/action/logout", api.LogoutAction)
+		e.POST("/action/login", api.LoginAction)
 
 		e.Logger.Fatal(e.Start(config.ListenIp + ":" + strconv.Itoa(config.ListenPort)))
 
