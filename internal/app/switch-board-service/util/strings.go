@@ -9,6 +9,8 @@ var StrAddExchangeFailedError = "Error occurred while adding exchange."
 var StrExchangeNotFoundError = "Could not find exchange specified."
 var StrExchangesCouldNotBeRetrieved = "Could not retrieve exchanges."
 var StrRemoveExchangeFailedError = "Error occurred while attempting to remove exchange."
+var StrRetrievingExchangesError = "Error occurred while trying to retrieve all exchanges."
+
 
 var StrAddTradePairError = "Could not create new trade pair model."
 var StrTradePairNotFoundError = "Trade pair with UUID does not exist."

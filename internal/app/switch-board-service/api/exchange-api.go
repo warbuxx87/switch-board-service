@@ -113,3 +113,29 @@ func AuthorizeExchangeAction(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: "", Success: true})
 }
+
+func RetrieveAllExchanges(c echo.Context) error {
+
+	cc := c.(*util.EndpointContext)
+
+	loggedError := util.CheckIfLoggedIn(cc.Context)
+
+
+	if loggedError != nil {
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
+	}
+
+	_ = util.CheckForValidSession(cc.Context)
+
+	var exchangeModels []models.ExchangeModel
+
+	findError := cc.AppContext.Database.Find(&exchangeModels).Error
+
+	if findError != nil {
+		raven.CaptureError(findError, nil)
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
+	}
+
+
+	return c.JSON(http.StatusOK, &responses.AllExchangesResponse{ Exchanges: exchangeModels, ErrorMessage: "", Success: true})
+}

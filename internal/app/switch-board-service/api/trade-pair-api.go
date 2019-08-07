@@ -102,7 +102,6 @@ func RetrieveAllTradePairs(c echo.Context) error {
 
 	loggedError := util.CheckIfLoggedIn(cc.Context)
 
-
 	if loggedError != nil {
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
 	}
@@ -118,6 +117,5 @@ func RetrieveAllTradePairs(c echo.Context) error {
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRetrievingTradePairsError, Success: false})
 	}
 
-
-	return c.JSON(http.StatusOK, &responses.AllTradePairsResponse{ TradePairs: tradePairModels, ErrorMessage: "", Success: true})
+	return c.JSON(http.StatusOK, &responses.AllTradePairsResponse{TradePairs: tradePairModels, ErrorMessage: "", Success: true})
 }
