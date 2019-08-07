@@ -33,6 +33,7 @@ func AddExchangeAction(c echo.Context) error {
 	}
 
 	exchangeModel.UUID = uuid.NewV4().String()
+	exchangeModel.AccessToken = uuid.NewV4().String()
 
 	createError := cc.AppContext.Database.Create(&exchangeModel).Error
 
