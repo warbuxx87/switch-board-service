@@ -14,5 +14,6 @@ var StrAddTradePairError = "Could not create new trade pair model."
 var StrTradePairNotFoundError = "Trade pair with UUID does not exist."
 var StrRemoveTradePairInUseError = "Could not remove trade pair has it is currently associated with an exchange."
 var StrRemoveTradePairFailedError = "Error occurred while removing trade pair."
+var StrRetrievingTradePairsError = "Error occurred while trying to retrieve all trade pairs."
 
 

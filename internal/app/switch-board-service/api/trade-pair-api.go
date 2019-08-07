@@ -95,3 +95,29 @@ func RemoveTradePairAction(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: "", Success: true})
 }
+
+func RetrieveAllTradePairs(c echo.Context) error {
+
+	cc := c.(*util.EndpointContext)
+
+	loggedError := util.CheckIfLoggedIn(cc.Context)
+
+
+	if loggedError != nil {
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
+	}
+
+	_ = util.CheckForValidSession(cc.Context)
+
+	var tradePairModels []models.TradePairModel
+
+	findError := cc.AppContext.Database.Find(&tradePairModels).Error
+
+	if findError != nil {
+		raven.CaptureError(findError, nil)
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRetrievingTradePairsError, Success: false})
+	}
+
+
+	return c.JSON(http.StatusOK, &responses.AllTradePairsResponse{ TradePairs: tradePairModels, ErrorMessage: "", Success: true})
+}
