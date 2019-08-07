@@ -3,6 +3,8 @@ package util
 var StrNotCurrentlyLoggedIn = "Not currently authorized."
 var StrIncorrectParametersPassed = "Parameters passed are not valid."
 
+var StrUserNotFoundError = "Username / Password combination does not exist."
+
 var StrAddExchangeFailedError = "Error occurred while adding exchange."
 var StrExchangeNotFoundError = "Could not find exchange specified."
 var StrExchangesCouldNotBeRetrieved = "Could not retrieve exchanges."

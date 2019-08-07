@@ -2,6 +2,7 @@ package api
 
 import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/forms"
+	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/responses"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
 	"crypto/sha256"
 	"fmt"
@@ -22,14 +23,14 @@ func LoginAction(c echo.Context) error {
 
 	if jsonBindError != nil {
 		raven.CaptureError(jsonBindError, nil)
-		return jsonBindError
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
 	}
 
 	userModel, userModelError := util.RetrieveUserModelByUsername(cc.AppContext.Database, loginForm.Username)
 
 	if userModelError != nil {
 		raven.CaptureError(userModelError, nil)
-		return userModelError
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrUserNotFoundError, Success: false})
 	}
 
 	if userModel.PasswordHash == fmt.Sprintf("%x", sha256.Sum256([]byte(loginForm.Password))) {
