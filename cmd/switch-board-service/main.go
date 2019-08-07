@@ -125,6 +125,9 @@ func main() {
 		e.GET("/action/remove_exchange", api.RemoveExchangeAction)
 		e.POST("/action/authorize_exchange", api.AuthorizeExchangeAction)
 
+		e.POST("/action/add_trade_pair", api.AddTradePairAction)
+		e.POST("/action/remove_trade_pair", api.RemoveTradePairAction)
+
 		e.Logger.Fatal(e.Start(config.ListenIp + ":" + strconv.Itoa(config.ListenPort)))
 
 		databaseCloseError := dataContext.Database.Close()

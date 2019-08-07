@@ -22,6 +22,10 @@ type Configuration struct {
 	LogLevel int
 }
 
+type ActionResult struct {
+
+}
+
 func LoadConfigurationFile() (*Configuration, error) {
 
 	configuration := Configuration{}

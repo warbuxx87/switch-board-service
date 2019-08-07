@@ -2,8 +2,10 @@ package api
 
 import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/models"
+	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/responses"
 	"github.com/getsentry/raven-go"
 	uuid "github.com/satori/go.uuid"
+	"net/http"
 
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
 	"github.com/labstack/echo"
@@ -16,7 +18,7 @@ func AddExchangeAction(c echo.Context) error {
 	loggedError := util.CheckIfLoggedIn(cc.Context)
 
 	if loggedError != nil {
-		return loggedError
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
 	}
 
 	_ = util.CheckForValidSession(cc.Context)
@@ -27,7 +29,7 @@ func AddExchangeAction(c echo.Context) error {
 
 	if jsonBindError != nil {
 		raven.CaptureError(jsonBindError, nil)
-		return jsonBindError
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 	}
 
 	exchangeModel.UUID = uuid.NewV4().String()
@@ -36,10 +38,10 @@ func AddExchangeAction(c echo.Context) error {
 
 	if createError != nil {
 		raven.CaptureError(createError, nil)
-		return createError
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrAddExchangeFailedError, Success: false})
 	}
 
-	return nil
+	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: "", Success: true})
 
 }
 
@@ -52,7 +54,7 @@ func RemoveExchangeAction(c echo.Context) error {
 	exchangeUUID := cc.Context.Param("exchangeUUID")
 
 	if loggedError != nil {
-		return loggedError
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
 	}
 
 	_ = util.CheckForValidSession(cc.Context)
@@ -63,17 +65,17 @@ func RemoveExchangeAction(c echo.Context) error {
 
 	if findError != nil {
 		raven.CaptureError(findError, nil)
-		return findError
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeNotFoundError, Success: false})
 	}
 
 	deleteError := cc.AppContext.Database.Unscoped().Delete(&exchangeModel).Error
 
 	if deleteError != nil {
 		raven.CaptureError(deleteError, nil)
-		return deleteError
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRemoveExchangeFailedError, Success: false})
 	}
 
-	return nil
+	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: "", Success: true})
 }
 
 func AuthorizeExchangeAction(c echo.Context) error {
@@ -83,7 +85,7 @@ func AuthorizeExchangeAction(c echo.Context) error {
 	loggedError := util.CheckIfLoggedIn(cc.Context)
 
 	if loggedError != nil {
-		return loggedError
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
 	}
 
 	_ = util.CheckForValidSession(cc.Context)
@@ -95,19 +97,19 @@ func AuthorizeExchangeAction(c echo.Context) error {
 
 	if jsonBindError != nil {
 		raven.CaptureError(jsonBindError, nil)
-		return jsonBindError
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 	}
 
 	findError := cc.AppContext.Database.Find(&exchangeModel, "uuid = ?", exchangeModel.UUID).Error
 
 	if findError != nil {
 		raven.CaptureError(findError, nil)
-		return findError
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeNotFoundError, Success: false})
 	}
 
 	exchangeModel.Authorized = exchangeModelForm.Authorized
 
 	cc.AppContext.Database.Save(&exchangeModel)
 
-	return nil
+	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: "", Success: true})
 }
