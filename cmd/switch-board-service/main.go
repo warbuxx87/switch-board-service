@@ -123,6 +123,7 @@ func main() {
 
 		e.POST("/action/add_exchange", api.AddExchangeAction)
 		e.GET("/action/remove_exchange", api.RemoveExchangeAction)
+		e.POST("/action/authorize_exchange", api.AuthorizeExchangeAction)
 
 		e.Logger.Fatal(e.Start(config.ListenIp + ":" + strconv.Itoa(config.ListenPort)))
 

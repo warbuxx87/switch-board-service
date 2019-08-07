@@ -75,3 +75,39 @@ func RemoveExchangeAction(c echo.Context) error {
 
 	return nil
 }
+
+func AuthorizeExchangeAction(c echo.Context) error {
+
+	cc := c.(*util.EndpointContext)
+
+	loggedError := util.CheckIfLoggedIn(cc.Context)
+
+	if loggedError != nil {
+		return loggedError
+	}
+
+	_ = util.CheckForValidSession(cc.Context)
+
+	exchangeModel := new(models.ExchangeModel)
+	exchangeModelForm := new(models.ExchangeModel)
+
+	jsonBindError := cc.Context.Bind(exchangeModelForm)
+
+	if jsonBindError != nil {
+		raven.CaptureError(jsonBindError, nil)
+		return jsonBindError
+	}
+
+	findError := cc.AppContext.Database.Find(&exchangeModel, "uuid = ?", exchangeModel.UUID).Error
+
+	if findError != nil {
+		raven.CaptureError(findError, nil)
+		return findError
+	}
+
+	exchangeModel.Authorized = exchangeModelForm.Authorized
+
+	cc.AppContext.Database.Save(&exchangeModel)
+
+	return nil
+}
