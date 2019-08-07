@@ -28,6 +28,9 @@ func connectToDatabase(config *util.Configuration) (*gorm.DB, error) {
 	}
 
 	database.AutoMigrate(&models.UserModel{})
+	database.AutoMigrate(&models.ExchangeModel{})
+	database.AutoMigrate(&models.TradePairModel{})
+	database.AutoMigrate(&models.AuthorizedTradePairModel{})
 
 	// Check to see if the default user exit
 	util.CheckForDefaultUser(database, config)
@@ -49,8 +52,6 @@ func main() {
 
 	config, configLoadError := util.LoadConfigurationFile()
 
-	_ = config
-
 	if configLoadError == nil {
 
 		// Set the logrus config level
@@ -63,7 +64,7 @@ func main() {
 
 		}
 
-		databaseConnection, databaseError := connectToDatabase(&config)
+		databaseConnection, databaseError := connectToDatabase(config)
 
 		if databaseError != nil {
 			logrus.Error(databaseError, nil)
@@ -75,6 +76,7 @@ func main() {
 		// Create the data context
 		dataContext := util.DataContext{}
 
+		dataContext.Config = config
 		dataContext.Database = databaseConnection
 
 		sentrySetDSNError := raven.SetDSN(config.SentryUrl)
@@ -118,6 +120,9 @@ func main() {
 
 		e.GET("/action/logout", api.LogoutAction)
 		e.POST("/action/login", api.LoginAction)
+
+		e.POST("/action/add_exchange", api.AddExchangeAction)
+		e.GET("/action/remove_exchange", api.RemoveExchangeAction)
 
 		e.Logger.Fatal(e.Start(config.ListenIp + ":" + strconv.Itoa(config.ListenPort)))
 

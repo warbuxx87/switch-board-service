@@ -22,18 +22,17 @@ type Configuration struct {
 	LogLevel int
 }
 
-func LoadConfigurationFile() (Configuration, error) {
+func LoadConfigurationFile() (*Configuration, error) {
 
 	configuration := Configuration{}
 	err := gonfig.GetConf("config.json", &configuration)
 
 	if err != nil {
 		logrus.WithFields(logrus.Fields{}).Error(err)
-
-		return Configuration{}, errors.New("Failed to load configuration file")
+		return nil, errors.New("Failed to load configuration file")
 	}
 
-	return configuration, nil
+	return &configuration, nil
 }
 
 func ShowBanner() {

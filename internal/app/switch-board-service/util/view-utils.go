@@ -18,7 +18,7 @@ func CheckForDefaultUser(database *gorm.DB, config *Configuration) {
 	if userModelError != nil {
 
 		database.Create(&models.UserModel{
-			UserUUID:     uuid.NewV4().String(),
+			UUID:     uuid.NewV4().String(),
 			Username:     "admin",
 			PasswordHash: "***REMOVED***",
 			FirstName:    "admin",

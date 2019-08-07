@@ -5,6 +5,7 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
 	"crypto/sha256"
 	"fmt"
+	"github.com/getsentry/raven-go"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
@@ -20,12 +21,14 @@ func LoginAction(c echo.Context) error {
 	jsonBindError := cc.Context.Bind(loginForm)
 
 	if jsonBindError != nil {
+		raven.CaptureError(jsonBindError, nil)
 		return jsonBindError
 	}
 
 	userModel, userModelError := util.RetrieveUserModelByUsername(cc.AppContext.Database, loginForm.Username)
 
 	if userModelError != nil {
+		raven.CaptureError(userModelError, nil)
 		return userModelError
 	}
 
@@ -47,7 +50,7 @@ func LoginAction(c echo.Context) error {
 		saveFailed := dateSession.Save(cc.Context.Request(), cc.Context.Response())
 
 		if saveFailed != nil {
-
+			raven.CaptureError(saveFailed, nil)
 			return saveFailed
 		}
 
@@ -77,7 +80,7 @@ func LogoutAction(c echo.Context) error {
 	saveFailed := dateSession.Save(cc.Context.Request(), cc.Context.Response())
 
 	if saveFailed != nil {
-
+		raven.CaptureError(saveFailed, nil)
 		return saveFailed
 	}
 
