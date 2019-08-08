@@ -139,7 +139,7 @@ func RetrieveAllExchanges(c echo.Context) error {
 	return c.JSON(http.StatusOK, &responses.AllExchangesResponse{Exchanges: exchangeModels, ErrorMessage: "", Success: true})
 }
 
-func RetireveExchangeInfoByExchangeToken(c echo.Context) error {
+func RetrieveExchangeInfoByExchangeToken(c echo.Context) error {
 
 	cc := c.(*util.EndpointContext)
 
