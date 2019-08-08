@@ -121,7 +121,6 @@ func RetrieveAllExchanges(c echo.Context) error {
 
 	loggedError := util.CheckIfLoggedIn(cc.Context)
 
-
 	if loggedError != nil {
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
 	}
@@ -137,6 +136,46 @@ func RetrieveAllExchanges(c echo.Context) error {
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
 	}
 
+	return c.JSON(http.StatusOK, &responses.AllExchangesResponse{Exchanges: exchangeModels, ErrorMessage: "", Success: true})
+}
 
-	return c.JSON(http.StatusOK, &responses.AllExchangesResponse{ Exchanges: exchangeModels, ErrorMessage: "", Success: true})
+func RetireveExchangeInfoByExchangeToken(c echo.Context) error {
+
+	cc := c.(*util.EndpointContext)
+
+	exchangeModelSubmitted := new(models.ExchangeModel)
+
+	jsonBindError := cc.Context.Bind(exchangeModelSubmitted)
+
+	if jsonBindError != nil {
+		raven.CaptureError(jsonBindError, nil)
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
+	}
+
+	var exchangeModels []models.ExchangeModel
+
+	findError := cc.AppContext.Database.Find(&exchangeModels).Error
+
+	if findError != nil {
+		raven.CaptureError(findError, nil)
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
+	}
+
+	for _, element := range exchangeModels {
+
+		if element.UUID == exchangeModelSubmitted.UUID {
+			if element.TempAccessToken == exchangeModelSubmitted.TempAccessToken {
+				// Temp access token valid lets return the information
+				return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: "", Success: true, Exchange: element})
+			} else {
+				// Invalid temp access token
+				return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeTempAccessTokenInvalid, Success: false})
+			}
+		}
+	}
+
+	// If we got here the exchange uuid is invalid
+
+	raven.CaptureMessage("Invalid Exchange UUID requested: "+exchangeModelSubmitted.UUID, nil)
+	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeNotFoundError, Success: false})
 }
