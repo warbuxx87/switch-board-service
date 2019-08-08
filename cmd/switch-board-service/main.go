@@ -128,6 +128,7 @@ func main() {
 		e.GET("/action/retrieve_all_exchanges", api.RetrieveAllExchangesAction)
 		e.POST("/action/retrieve_exchange_by_temp_token", api.RetrieveExchangeInfoByExchangeTokenAction)
 		e.POST("/action/generate_new_temp_token", api.GenerateNewTempTokenAction)
+		e.POST("/action/revoke_temp_access_token", api.RevokeTempAccessTokenAction)
 
 		e.POST("/action/add_trade_pair", api.AddTradePairAction)
 		e.POST("/action/remove_trade_pair", api.RemoveTradePairAction)
