@@ -14,6 +14,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/middleware"
+	uuid "github.com/satori/go.uuid"
 	"html/template"
 	"os"
 	"strconv"
@@ -98,7 +99,7 @@ func main() {
 
 		e.Static("/static", "assets")
 
-		e.Use(session.Middleware(sessions.NewCookieStore([]byte("herpderp"))))
+		e.Use(session.Middleware(sessions.NewCookieStore([]byte(uuid.NewV4().String()))))
 		e.Use(middleware.Logger())
 
 		templates := make(map[string]*template.Template)
