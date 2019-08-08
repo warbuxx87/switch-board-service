@@ -125,8 +125,9 @@ func main() {
 		e.POST("/action/add_exchange", api.AddExchangeAction)
 		e.GET("/action/remove_exchange", api.RemoveExchangeAction)
 		e.POST("/action/authorize_exchange", api.AuthorizeExchangeAction)
-		e.GET("/action/retrieve_all_exchanges", api.RetrieveAllExchanges)
-		e.POST("/action/retrieve_exchange_info_by_token", api.RetrieveExchangeInfoByExchangeToken)
+		e.GET("/action/retrieve_all_exchanges", api.RetrieveAllExchangesAction)
+		e.POST("/action/retrieve_exchange_by_temp_token", api.RetrieveExchangeInfoByExchangeTokenAction)
+		e.POST("/action/generate_new_temp_token", api.GenerateNewTempTokenAction)
 
 		e.POST("/action/add_trade_pair", api.AddTradePairAction)
 		e.POST("/action/remove_trade_pair", api.RemoveTradePairAction)

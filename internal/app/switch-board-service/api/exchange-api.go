@@ -115,7 +115,7 @@ func AuthorizeExchangeAction(c echo.Context) error {
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: "", Success: true})
 }
 
-func RetrieveAllExchanges(c echo.Context) error {
+func RetrieveAllExchangesAction(c echo.Context) error {
 
 	cc := c.(*util.EndpointContext)
 
@@ -139,7 +139,7 @@ func RetrieveAllExchanges(c echo.Context) error {
 	return c.JSON(http.StatusOK, &responses.AllExchangesResponse{Exchanges: exchangeModels, ErrorMessage: "", Success: true})
 }
 
-func RetrieveExchangeInfoByExchangeToken(c echo.Context) error {
+func RetrieveExchangeInfoByExchangeTokenAction(c echo.Context) error {
 
 	cc := c.(*util.EndpointContext)
 
@@ -149,7 +149,11 @@ func RetrieveExchangeInfoByExchangeToken(c echo.Context) error {
 
 	if jsonBindError != nil {
 		raven.CaptureError(jsonBindError, nil)
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
+	}
+
+	if exchangeModelSubmitted.UUID == "" || exchangeModelSubmitted.TempAccessToken == "" {
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 	}
 
 	var exchangeModels []models.ExchangeModel
@@ -177,5 +181,5 @@ func RetrieveExchangeInfoByExchangeToken(c echo.Context) error {
 	// If we got here the exchange uuid is invalid
 
 	raven.CaptureMessage("Invalid Exchange UUID requested: "+exchangeModelSubmitted.UUID, nil)
-	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeNotFoundError, Success: false})
+	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
 }

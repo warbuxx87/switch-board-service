@@ -11,6 +11,7 @@ var StrExchangesCouldNotBeRetrieved = "Could not retrieve exchanges."
 var StrRemoveExchangeFailedError = "Error occurred while attempting to remove exchange."
 var StrRetrievingExchangesError = "Error occurred while trying to retrieve all exchanges."
 var StrExchangeTempAccessTokenInvalid = "Error the temp access token is no longer valid."
+var StrExchangeAccessTokenInvalid = "Error exchange id or access token is invliad. "
 
 
 var StrAddTradePairError = "Could not create new trade pair model."
