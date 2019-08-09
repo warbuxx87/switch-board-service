@@ -31,6 +31,7 @@ func connectToDatabase(config *util.Configuration) (*gorm.DB, error) {
 	database.AutoMigrate(&models.UserModel{})
 	database.AutoMigrate(&models.ExchangeModel{})
 	database.AutoMigrate(&models.TradePairModel{})
+	database.AutoMigrate(&models.ServiceKeyModel{})
 	database.AutoMigrate(&models.AuthorizedTradePairModel{})
 
 	// Check to see if the default user exit
@@ -133,7 +134,12 @@ func main() {
 		e.POST("/action/add_trade_pair", api.AddTradePairAction)
 		e.POST("/action/remove_trade_pair", api.RemoveTradePairAction)
 		e.GET("/action/retrieve_all_trade_pairs", api.RetrieveAllTradePairs)
-		
+
+		e.POST("/action/add_service_key", api.AddServiceKeyAction)
+		e.POST("/action/remove_service_key", api.RemoveServiceKeyAction)
+		e.POST("/action/service_retrieve_all_exchanges", api.ServiceRetrieveAllExchangesAction)
+		e.POST("/action/service_retrieve_all_trade_pairs", api.ServiceRetrieveAllTradePairsAction)
+
 		e.Logger.Fatal(e.Start(config.ListenIp + ":" + strconv.Itoa(config.ListenPort)))
 
 		databaseCloseError := dataContext.Database.Close()
