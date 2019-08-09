@@ -134,8 +134,8 @@ func main() {
 		e.POST("/action/remove_trade_pair", api.RemoveTradePairAction)
 		e.GET("/action/retrieve_all_trade_pairs", api.RetrieveAllTradePairs)
 
-		logrus.Info("WILL REMOVE LATER")
-		
+		logrus.Info("WILL REMOVE LATR")
+
 		e.Logger.Fatal(e.Start(config.ListenIp + ":" + strconv.Itoa(config.ListenPort)))
 
 		databaseCloseError := dataContext.Database.Close()
