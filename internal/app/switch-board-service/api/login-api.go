@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"github.com/getsentry/raven-go"
 	"github.com/gorilla/sessions"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo-contrib/session"
 	"net/http"
 )

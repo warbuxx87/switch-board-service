@@ -2,7 +2,7 @@ package util
 
 import (
 	"fmt"
-	"github.com/Sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"github.com/pkg/errors"
 	"github.com/tkanos/gonfig"
 )
