@@ -70,6 +70,8 @@ func ValidateAccessAction(c echo.Context) error {
 		}
 	}
 
+	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
+
 }
 
 func GenerateNewTempTokenAction(c echo.Context) error {
