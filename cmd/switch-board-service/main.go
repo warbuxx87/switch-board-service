@@ -6,15 +6,15 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/views"
 	"encoding/gob"
-	"github.com/sirupsen/logrus"
 	"github.com/getsentry/raven-go"
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo-contrib/session"
+	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	uuid "github.com/satori/go.uuid"
+	"github.com/sirupsen/logrus"
 	"html/template"
 	"os"
 	"strconv"
@@ -128,6 +128,8 @@ func main() {
 		e.POST("/action/authorize_exchange", api.AuthorizeExchangeAction)
 		e.GET("/action/retrieve_all_exchanges", api.RetrieveAllExchangesAction)
 		e.POST("/action/retrieve_exchange_by_temp_token", api.RetrieveExchangeInfoByExchangeTokenAction)
+
+		e.POST("/action/validate_access_action", api.ValidateAccessAction)
 		e.POST("/action/generate_new_temp_token", api.GenerateNewTempTokenAction)
 		e.POST("/action/revoke_temp_access_token", api.RevokeTempAccessTokenAction)
 

@@ -10,6 +10,68 @@ import (
 	"net/http"
 )
 
+func ValidateAccessAction(c echo.Context) error {
+	cc := c.(*util.EndpointContext)
+
+	exchangeModelSubmitted := new(models.ExchangeModel)
+
+	jsonBindError := cc.Context.Bind(exchangeModelSubmitted)
+
+	if jsonBindError != nil {
+		raven.CaptureError(jsonBindError, nil)
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
+	}
+
+	if exchangeModelSubmitted.UUID == "" || exchangeModelSubmitted.AccessToken == "" {
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
+	}
+
+	// Hunt for exchange model access
+	var exchangeModels []models.ExchangeModel
+
+	findError := cc.AppContext.Database.Find(&exchangeModels).Error
+
+	if findError != nil {
+		raven.CaptureError(findError, nil)
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
+	}
+
+	for _, element := range exchangeModels {
+
+		if element.UUID == exchangeModelSubmitted.UUID {
+			if element.AccessToken == exchangeModelSubmitted.AccessToken {
+				return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: "", Success: true})
+
+			}
+		}
+	}
+
+	// Hunt service key models
+	var serviceKeyModels []models.ServiceKeyModel
+
+	serviceKeyFindError := cc.AppContext.Database.Find(&serviceKeyModels).Error
+
+	if serviceKeyFindError != nil {
+		raven.CaptureError(serviceKeyFindError, nil)
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrServiceKeysCouldNotBeRetrieved, Success: false})
+	}
+
+	for _, element := range serviceKeyModels {
+
+		if element.UUID == exchangeModelSubmitted.UUID {
+			if element.AccessToken == exchangeModelSubmitted.AccessToken {
+
+				return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: "", Success: true})
+
+			} else {
+				// Invalid access token
+				return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrServiceAccessTokenInvalid, Success: false})
+			}
+		}
+	}
+
+}
+
 func GenerateNewTempTokenAction(c echo.Context) error {
 
 	cc := c.(*util.EndpointContext)
@@ -125,4 +187,3 @@ func RevokeTempAccessTokenAction(c echo.Context) error {
 	raven.CaptureMessage("Invalid Exchange UUID requested: "+exchangeModelSubmitted.UUID, nil)
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
 }
-
