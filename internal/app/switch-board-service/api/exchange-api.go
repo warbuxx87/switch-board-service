@@ -136,10 +136,17 @@ func RetrieveAllExchangesAction(c echo.Context) error {
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
 	}
 
-	return c.JSON(http.StatusOK, &responses.AllExchangesResponse{Exchanges: exchangeModels, ErrorMessage: "", Success: true})
+	var sanitizedExchangeModels []models.ExchangeModel
+
+	for _, element := range exchangeModels {
+		element.AccessToken = ""
+		sanitizedExchangeModels = append(sanitizedExchangeModels, element)
+	}
+
+	return c.JSON(http.StatusOK, &responses.AllExchangesResponse{Exchanges: sanitizedExchangeModels, ErrorMessage: "", Success: true})
 }
 
-func RetrieveExchangeInfoByExchangeTokenAction(c echo.Context) error {
+func RetrieveExchangeInfoByExchangeTempTokenAction(c echo.Context) error {
 
 	cc := c.(*util.EndpointContext)
 
@@ -170,6 +177,7 @@ func RetrieveExchangeInfoByExchangeTokenAction(c echo.Context) error {
 		if element.UUID == exchangeModelSubmitted.UUID {
 			if element.TempAccessToken == exchangeModelSubmitted.TempAccessToken {
 				// Temp access token valid lets return the information
+				element.AccessToken = ""
 				return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: "", Success: true, Exchange: element})
 			} else {
 				// Invalid temp access token

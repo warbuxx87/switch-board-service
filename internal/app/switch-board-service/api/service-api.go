@@ -118,7 +118,14 @@ func ServiceRetrieveAllExchangesAction(c echo.Context) error {
 					return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
 				}
 
-				return c.JSON(http.StatusOK, &responses.AllExchangesResponse{ErrorMessage: "", Success: true, Exchanges: exchangeModels})
+				var sanitizedExchangeModels []models.ExchangeModel
+
+				for _, element := range exchangeModels {
+					element.AccessToken = ""
+					sanitizedExchangeModels = append(sanitizedExchangeModels, element)
+				}
+
+				return c.JSON(http.StatusOK, &responses.AllExchangesResponse{ErrorMessage: "", Success: true, Exchanges: sanitizedExchangeModels})
 			} else {
 				// Invalid access token
 				return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrServiceAccessTokenInvalid, Success: false})

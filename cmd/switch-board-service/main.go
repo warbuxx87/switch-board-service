@@ -127,7 +127,7 @@ func main() {
 		e.GET("/action/remove_exchange", api.RemoveExchangeAction)
 		e.POST("/action/authorize_exchange", api.AuthorizeExchangeAction)
 		e.GET("/action/retrieve_all_exchanges", api.RetrieveAllExchangesAction)
-		e.POST("/action/retrieve_exchange_by_temp_token", api.RetrieveExchangeInfoByExchangeTokenAction)
+		e.POST("/action/retrieve_exchange_by_temp_token", api.RetrieveExchangeInfoByExchangeTempTokenAction)
 
 		e.POST("/action/validate_access", api.ValidateAccessAction)
 		e.POST("/action/generate_new_temp_token", api.GenerateNewTempTokenAction)

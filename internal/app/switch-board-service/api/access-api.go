@@ -115,6 +115,7 @@ func GenerateNewTempTokenAction(c echo.Context) error {
 					return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeNotFoundError, Success: false})
 				}
 
+				exchangeModel.AccessToken = ""
 				exchangeModel.TempAccessToken = uuid.NewV4().String()
 
 				cc.AppContext.Database.Save(&exchangeModel)
