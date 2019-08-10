@@ -11,5 +11,5 @@ type ExchangeModel struct {
 	AccessToken     string `json:"access_token" form:"access_token" query:"access_token"`
 	TempAccessToken string `json:"temp_access_token" form:"temp_access_token" query:"temp_access_token"`
 
-	AuthorizedTradePairs []AuthorizedTradePairModel `gorm:"foreignkey:ExchangeModelRefer"`
+	AuthorizedTradePairs []*TradePairModel `gorm:"many2many:exchange_authorized_trade_pairs;" json:"authorized_trade_pairs" form:"authorized_trade_pairs" query:"authorized_trade_pairs"`
 }

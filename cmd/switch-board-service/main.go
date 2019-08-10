@@ -32,7 +32,6 @@ func connectToDatabase(config *util.Configuration) (*gorm.DB, error) {
 	database.AutoMigrate(&models.ExchangeModel{})
 	database.AutoMigrate(&models.TradePairModel{})
 	database.AutoMigrate(&models.ServiceKeyModel{})
-	database.AutoMigrate(&models.AuthorizedTradePairModel{})
 
 	// Check to see if the default user exit
 	util.CheckForDefaultUser(database, config)
