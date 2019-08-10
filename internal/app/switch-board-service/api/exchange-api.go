@@ -140,6 +140,9 @@ func RetrieveAllExchangesAction(c echo.Context) error {
 
 	for _, element := range exchangeModels {
 		element.AccessToken = ""
+		var tradePairs []models.TradePairModel
+		cc.AppContext.Database.Model(&element).Related(&tradePairs, "AuthorizedTradePairs")
+		element.AuthorizedTradePairs = tradePairs
 		sanitizedExchangeModels = append(sanitizedExchangeModels, element)
 	}
 
@@ -178,6 +181,9 @@ func RetrieveExchangeInfoByExchangeTempTokenAction(c echo.Context) error {
 			if element.TempAccessToken == exchangeModelSubmitted.TempAccessToken {
 				// Temp access token valid lets return the information
 				element.AccessToken = ""
+				var tradePairs []models.TradePairModel
+				cc.AppContext.Database.Model(&element).Related(&tradePairs, "AuthorizedTradePairs")
+				element.AuthorizedTradePairs = tradePairs
 				return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: "", Success: true, Exchange: element})
 			} else {
 				// Invalid temp access token

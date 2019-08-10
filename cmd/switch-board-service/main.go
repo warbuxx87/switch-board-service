@@ -35,7 +35,7 @@ func connectToDatabase(config *util.Configuration) (*gorm.DB, error) {
 
 	// Check to see if the default user exit
 	util.CheckForDefaultUser(database, config)
-
+	
 	return database, nil
 
 }

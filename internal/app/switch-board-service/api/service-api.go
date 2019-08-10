@@ -122,6 +122,9 @@ func ServiceRetrieveAllExchangesAction(c echo.Context) error {
 
 				for _, element := range exchangeModels {
 					element.AccessToken = ""
+					var tradePairs []models.TradePairModel
+					cc.AppContext.Database.Model(&element).Related(&tradePairs, "AuthorizedTradePairs")
+					element.AuthorizedTradePairs = tradePairs
 					sanitizedExchangeModels = append(sanitizedExchangeModels, element)
 				}
 
