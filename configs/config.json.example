@@ -5,5 +5,6 @@
   "DatabaseName":"",
   "DatabaseUsername": "",
   "DatabasePassword": "",
-  "LogLevel": 1
+  "LogLevel": 1,
+  "JWTSecret": "somesecret"
 }

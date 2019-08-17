@@ -4,8 +4,8 @@ go 1.12
 
 require (
 	github.com/certifi/gocertifi v0.0.0-20190506164543-d2eda7129713 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/getsentry/raven-go v0.2.0
-	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/gorilla/sessions v1.2.0
 	github.com/jinzhu/gorm v1.9.10
 	github.com/labstack/echo v3.3.10+incompatible // indirect
@@ -14,5 +14,6 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.4.2
+	github.com/swaggo/swag v1.6.2 // indirect
 	github.com/tkanos/gonfig v0.0.0-20181112185242-896f3d81fadf
 )

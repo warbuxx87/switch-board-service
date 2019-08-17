@@ -1,0 +1,524 @@
+basePath: /
+definitions:
+  forms.AccessCredentialsForm:
+    properties:
+      access_token:
+        type: string
+      uuid:
+        type: string
+    type: object
+  forms.CreateExchangeForm:
+    properties:
+      name:
+        type: string
+    type: object
+  forms.CreateServiceForm:
+    properties:
+      name:
+        type: string
+    type: object
+  forms.CreateTradePairForm:
+    properties:
+      base_asset:
+        type: string
+      name:
+        type: string
+      secondary_asset:
+        type: string
+    type: object
+  forms.LoginForm:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  models.ExchangeModel:
+    properties:
+      access_token:
+        type: string
+      authorized:
+        type: boolean
+      exchange_authorized_trade_pairs:
+        items:
+          $ref: '#/definitions/models.TradePairModel'
+        type: array
+      name:
+        type: string
+      temp_access_token:
+        type: string
+      uuid:
+        type: string
+    type: object
+  models.TradePairModel:
+    properties:
+      base_asset:
+        type: string
+      name:
+        type: string
+      secondary_asset:
+        type: string
+      uuid:
+        type: string
+    type: object
+  responses.AllExchangesResponse:
+    properties:
+      error_message:
+        type: string
+      exchanges:
+        items:
+          $ref: '#/definitions/models.ExchangeModel'
+        type: array
+      success:
+        type: boolean
+    type: object
+  responses.AllTradePairsResponse:
+    properties:
+      error_message:
+        type: string
+      success:
+        type: boolean
+      trade_pairs:
+        items:
+          $ref: '#/definitions/models.TradePairModel'
+        type: array
+    type: object
+  responses.LoginResponse:
+    properties:
+      error_message:
+        type: string
+      success:
+        type: boolean
+      token:
+        type: string
+    type: object
+  responses.SuccessFailureResponse:
+    properties:
+      error_message:
+        type: string
+      success:
+        type: boolean
+    type: object
+host: 127.0.0.1:7020
+info:
+  contact:
+    email: royal@alkemi.ai
+    name: Raynaldo Rivera
+    url: https://alkemi.ai
+  description: This service manages the authorization for exchanges and trade pairs
+  license:
+    name: Proprietary
+  title: Alkemi - Switch Board Service
+  version: "1.0"
+paths:
+  /v1/action/authorize_exchange:
+    get:
+      consumes:
+      - application/json
+      description: Authorizes an exchange
+      parameters:
+      - description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Exchange UUID
+        in: query
+        name: exchangeUUID
+        required: true
+        type: string
+      - description: Should the exchange be authorized
+        in: query
+        name: exchangeAuthorized
+        required: true
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.SuccessFailureResponse'
+      summary: Authorizes an exchange
+      tags:
+      - Exchange
+  /v1/action/create_exchange:
+    post:
+      consumes:
+      - application/json
+      description: Create a new exchange entry.
+      parameters:
+      - description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Add Exchange Form
+        in: body
+        name: createExchangeModel
+        required: true
+        schema:
+          $ref: '#/definitions/forms.CreateExchangeForm'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.SuccessFailureResponse'
+      summary: Create a new exchange entry.
+      tags:
+      - Exchange
+  /v1/action/create_service_key:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new service entry
+      parameters:
+      - description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Add Exchange Form
+        in: body
+        name: createServiceKeyModel
+        required: true
+        schema:
+          $ref: '#/definitions/forms.CreateServiceForm'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.AllExchangesResponse'
+      summary: Create a service key entry .
+      tags:
+      - Service
+  /v1/action/create_trade_pair:
+    post:
+      consumes:
+      - application/json
+      description: Create a trade pair entry.
+      parameters:
+      - description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Trade Pair Form
+        in: body
+        name: createTradePairModel
+        required: true
+        schema:
+          $ref: '#/definitions/forms.CreateTradePairForm'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.SuccessFailureResponse'
+      summary: Create a trade pair entry.
+      tags:
+      - TradePair
+  /v1/action/remove_exchange:
+    get:
+      consumes:
+      - application/json
+      description: Removes a existing exchange entry
+      parameters:
+      - description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Exchange UUID to Remove
+        in: query
+        name: exchangeUUID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.SuccessFailureResponse'
+      summary: Removes a existing exchange entry.
+      tags:
+      - Exchange
+  /v1/action/remove_service_key:
+    get:
+      consumes:
+      - application/json
+      description: Removes a service key entry
+      parameters:
+      - description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Service Key UUID to Remove
+        in: query
+        name: serviceKeyUUID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.SuccessFailureResponse'
+      summary: Removes a service key entry
+      tags:
+      - Service
+  /v1/action/remove_trade_pair:
+    get:
+      consumes:
+      - application/json
+      description: Removes a trade pair entry
+      parameters:
+      - description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Trade Pair UUID
+        in: query
+        name: tradePairUUID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.SuccessFailureResponse'
+      summary: Removes a trade pair entry.
+      tags:
+      - TradePair
+  /v1/action/retrieve_all_exchanges:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all exchanges and exchange information
+      parameters:
+      - description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.AllExchangesResponse'
+      summary: Retrieve all exchanges .
+      tags:
+      - Exchange
+  /v1/action/retrieve_all_trade_pairs:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all trade pair entries
+      parameters:
+      - description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.AllTradePairsResponse'
+      summary: Retrieve all trade pairs .
+      tags:
+      - TradePair
+  /v1/action/retrieve_exchange_by_temp_token:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all exchanges and exchange information
+      parameters:
+      - description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Exchange UUID
+        in: query
+        name: exchangeUUID
+        required: true
+        type: string
+      - description: Exchange Temp Access Token
+        in: query
+        name: exchangeTempAccessToken
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.AllExchangesResponse'
+      summary: Retrieve exchange info by temp token .
+      tags:
+      - Exchange
+  /v1/generate_new_temp_token:
+    post:
+      consumes:
+      - application/json
+      description: Generate a new temp token for a exchange
+      parameters:
+      - description: Exchange Access Credentials
+        in: body
+        name: exchangeAccessCredentialsForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.AccessCredentialsForm'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.SuccessFailureResponse'
+      summary: Generate a new temp token for a exchange
+      tags:
+      - Public
+  /v1/login:
+    post:
+      consumes:
+      - application/json
+      description: Login endpoint to receive a JWT token to authorize against protected
+        endpoints.
+      parameters:
+      - description: User Credentials
+        in: body
+        name: user_credentials
+        required: true
+        schema:
+          $ref: '#/definitions/forms.LoginForm'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.LoginResponse'
+      summary: Login and receive JWT token.
+      tags:
+      - Public
+  /v1/revoke_temp_access_token:
+    post:
+      consumes:
+      - application/json
+      description: Revokes an exchanges temp access token
+      parameters:
+      - description: Exchange Access Credentials
+        in: body
+        name: exchangeAccessCredentialsForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.AccessCredentialsForm'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.SuccessFailureResponse'
+      summary: Revokes an exchanges temp access token
+      tags:
+      - Public
+  /v1/service/service_retrieve_all_exchanges:
+    post:
+      consumes:
+      - application/json
+      description: Retrieves all exchanges and exchange information
+      parameters:
+      - description: Service Key Credentials
+        in: body
+        name: serviceKeyCredentialForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.AccessCredentialsForm'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.AllExchangesResponse'
+      summary: Retrieve all exchanges .
+      tags:
+      - Service-Endpoints
+  /v1/service/service_retrieve_all_trade_pairs:
+    post:
+      consumes:
+      - application/json
+      description: Retrieves all trade pair entries
+      parameters:
+      - description: Service Key Credentials
+        in: body
+        name: accessCredentialForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.AccessCredentialsForm'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.AllExchangesResponse'
+      summary: Retrieve all trade pair entries .
+      tags:
+      - Service-Endpoints
+  /v1/validate_access:
+    post:
+      consumes:
+      - application/json
+      description: Validates exchanges and service credentials
+      parameters:
+      - description: Exchange Access Credentials
+        in: body
+        name: exchangeAccessCredentialForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.AccessCredentialsForm'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.SuccessFailureResponse'
+      summary: Validates exchanges and service credentials
+      tags:
+      - Public
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

@@ -4,7 +4,6 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/api"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/models"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
-	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/views"
 	"encoding/gob"
 	"github.com/getsentry/raven-go"
 	"github.com/gorilla/sessions"
@@ -35,7 +34,7 @@ func connectToDatabase(config *util.Configuration) (*gorm.DB, error) {
 
 	// Check to see if the default user exit
 	util.CheckForDefaultUser(database, config)
-	
+
 	return database, nil
 
 }
@@ -46,6 +45,24 @@ func init() {
 
 	logrus.SetLevel(logrus.InfoLevel)
 }
+
+// @title Alkemi - Switch Board Service
+// @version 1.0
+// @description This service manages the authorization for exchanges and trade pairs
+
+// @contact.name Raynaldo Rivera
+// @contact.url https://alkemi.ai
+// @contact.email royal@alkemi.ai
+
+// @license.name Proprietary
+// @license.url
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+
+// @host 127.0.0.1:7020
+// @BasePath /
 
 func main() {
 
@@ -91,6 +108,7 @@ func main() {
 
 		// Register our custom app context
 		e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
+
 			return func(c echo.Context) error {
 				cc := &util.EndpointContext{Context: c, AppContext: &dataContext}
 				return h(cc)
@@ -100,7 +118,15 @@ func main() {
 		e.Static("/static", "assets")
 
 		e.Use(session.Middleware(sessions.NewCookieStore([]byte(uuid.NewV4().String()))))
+
 		e.Use(middleware.Logger())
+
+		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowOrigins:     []string{"*"},
+			AllowHeaders:     []string{"authorization", "Content-Type"},
+			AllowCredentials: true,
+			AllowMethods:     []string{echo.OPTIONS, echo.GET, echo.POST},
+		}))
 
 		templates := make(map[string]*template.Template)
 
@@ -115,31 +141,36 @@ func main() {
 
 		e.HideBanner = true
 
-		e.GET("/", views.RedirectView)
-		e.GET("/login", views.LoginView)
-		e.GET("/dashboard", views.DashboardView)
+		// Public
+		e.POST("/v1/login", api.LoginAction)
+		e.POST("/v1/generate_new_temp_token", api.GenerateNewTempTokenAction)
+		e.POST("/v1/revoke_temp_access_token", api.RevokeTempAccessTokenAction)
 
-		e.GET("/action/logout", api.LogoutAction)
-		e.POST("/action/login", api.LoginAction)
+		// Services
+		e.POST("/v1/validate_access", api.ValidateAccessAction)
+		e.POST("/v1/service/service_retrieve_all_exchanges", api.ServiceRetrieveAllExchangesAction)
+		e.POST("/v1/service/service_retrieve_all_trade_pairs", api.ServiceRetrieveAllTradePairsAction)
 
-		e.POST("/action/add_exchange", api.AddExchangeAction)
-		e.GET("/action/remove_exchange", api.RemoveExchangeAction)
-		e.POST("/action/authorize_exchange", api.AuthorizeExchangeAction)
-		e.GET("/action/retrieve_all_exchanges", api.RetrieveAllExchangesAction)
-		e.POST("/action/retrieve_exchange_by_temp_token", api.RetrieveExchangeInfoByExchangeTempTokenAction)
+		r := e.Group("/v1/action")
 
-		e.POST("/action/validate_access", api.ValidateAccessAction)
-		e.POST("/action/generate_new_temp_token", api.GenerateNewTempTokenAction)
-		e.POST("/action/revoke_temp_access_token", api.RevokeTempAccessTokenAction)
+		r.Use(middleware.JWT([]byte(config.JWTSecret)))
 
-		e.POST("/action/add_trade_pair", api.AddTradePairAction)
-		e.POST("/action/remove_trade_pair", api.RemoveTradePairAction)
-		e.GET("/action/retrieve_all_trade_pairs", api.RetrieveAllTradePairs)
+		// Exchanges
+		r.POST("/create_exchange", api.CreateExchangeAction)
+		r.GET("/remove_exchange", api.RemoveExchangeAction)
+		r.GET("/authorize_exchange", api.AuthorizeExchangeAction)
+		r.GET("/retrieve_all_exchanges", api.RetrieveAllExchangesAction)
+		r.GET("/retrieve_exchange_by_temp_token", api.RetrieveExchangeInfoByExchangeTempTokenAction)
 
-		e.POST("/action/add_service_key", api.AddServiceKeyAction)
-		e.POST("/action/remove_service_key", api.RemoveServiceKeyAction)
-		e.POST("/action/service_retrieve_all_exchanges", api.ServiceRetrieveAllExchangesAction)
-		e.POST("/action/service_retrieve_all_trade_pairs", api.ServiceRetrieveAllTradePairsAction)
+		// Trade pair
+		r.POST("/create_trade_pair", api.CreateTradePairAction)
+		r.GET("/remove_trade_pair", api.RemoveTradePairAction)
+		r.GET("/retrieve_all_trade_pairs", api.RetrieveAllTradePairs)
+
+		// Service Keys
+		r.POST("/create_service_key", api.CreateServiceKeyAction)
+		r.GET("/remove_service_key", api.RemoveServiceKeyAction)
+
 
 		e.Logger.Fatal(e.Start(config.ListenIp + ":" + strconv.Itoa(config.ListenPort)))
 

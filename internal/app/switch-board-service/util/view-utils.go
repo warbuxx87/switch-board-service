@@ -3,8 +3,8 @@ package util
 import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/models"
 	"github.com/jinzhu/gorm"
-	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo-contrib/session"
+	"github.com/labstack/echo/v4"
 	"github.com/satori/go.uuid"
 	"net/http"
 )
@@ -18,7 +18,7 @@ func CheckForDefaultUser(database *gorm.DB, config *Configuration) {
 	if userModelError != nil {
 
 		database.Create(&models.UserModel{
-			UUID:     uuid.NewV4().String(),
+			UUID: uuid.NewV4().String(),
 			Username:     "admin",
 			PasswordHash: "***REMOVED***",
 			FirstName:    "admin",

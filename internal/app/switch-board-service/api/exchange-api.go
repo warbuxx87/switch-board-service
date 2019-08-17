@@ -1,37 +1,44 @@
 package api
 
 import (
+	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/forms"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/models"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/responses"
 	"github.com/getsentry/raven-go"
 	uuid "github.com/satori/go.uuid"
 	"net/http"
+	"strconv"
 
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
 	"github.com/labstack/echo/v4"
 )
 
-func AddExchangeAction(c echo.Context) error {
+// Create Exchange godoc
+// @Summary Create a new exchange entry.
+// @Description Create a new exchange entry.
+// @Accept  json
+// @Produce  json
+// @Tags Exchange
+// @Param Authorization header string true "Authentication header"
+// @Param createExchangeModel body forms.CreateExchangeForm true "Add Exchange Form"
+// @Success 200 {object} responses.SuccessFailureResponse ""
+// @Failure 200 {object} responses.SuccessFailureResponse ""
+// @Router /v1/action/create_exchange [post]
+func CreateExchangeAction(c echo.Context) error {
 
 	cc := c.(*util.EndpointContext)
 
-	loggedError := util.CheckIfLoggedIn(cc.Context)
-
-	if loggedError != nil {
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
-	}
-
-	_ = util.CheckForValidSession(cc.Context)
-
 	exchangeModel := new(models.ExchangeModel)
+	addExchangeForm := new(forms.CreateExchangeForm)
 
-	jsonBindError := cc.Context.Bind(exchangeModel)
+	jsonBindError := cc.Context.Bind(addExchangeForm)
 
 	if jsonBindError != nil {
 		raven.CaptureError(jsonBindError, nil)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 	}
 
+	exchangeModel.Name = addExchangeForm.Name
 	exchangeModel.UUID = uuid.NewV4().String()
 	exchangeModel.AccessToken = uuid.NewV4().String()
 
@@ -46,26 +53,29 @@ func AddExchangeAction(c echo.Context) error {
 
 }
 
+// Remove Exchange Entry godoc
+// @Summary Removes a existing exchange entry.
+// @Description Removes a existing exchange entry
+// @Accept  json
+// @Produce  json
+// @Tags Exchange
+// @Param Authorization header string true "Authentication header"
+// @Param exchangeUUID query string true "Exchange UUID to Remove"
+// @Success 200 {object} responses.SuccessFailureResponse ""
+// @Failure 200 {object} responses.SuccessFailureResponse ""
+// @Router /v1/action/remove_exchange [get]
 func RemoveExchangeAction(c echo.Context) error {
 
 	cc := c.(*util.EndpointContext)
 
-	loggedError := util.CheckIfLoggedIn(cc.Context)
-
-	exchangeUUID := cc.Context.Param("exchangeUUID")
-
-	if loggedError != nil {
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
-	}
-
-	_ = util.CheckForValidSession(cc.Context)
+	exchangeUUID := cc.Context.QueryParam("exchangeUUID")
 
 	exchangeModel := new(models.ExchangeModel)
 
 	findError := cc.AppContext.Database.Find(&exchangeModel, "uuid = ?", exchangeUUID).Error
 
 	if findError != nil {
-		raven.CaptureError(findError, nil)
+		//raven.CaptureError(findError, nil)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeNotFoundError, Success: false})
 	}
 
@@ -79,53 +89,60 @@ func RemoveExchangeAction(c echo.Context) error {
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: "", Success: true})
 }
 
+// Authorize Exchange godoc
+// @Summary Authorizes an exchange
+// @Description  Authorizes an exchange
+// @Accept  json
+// @Produce  json
+// @Tags Exchange
+// @Param Authorization header string true "Authentication header"
+// @Param exchangeUUID query string true "Exchange UUID"
+// @Param exchangeAuthorized query bool true "Should the exchange be authorized"
+// @Success 200 {object} responses.SuccessFailureResponse ""
+// @Failure 200 {object} responses.SuccessFailureResponse ""
+// @Router /v1/action/authorize_exchange [get]
 func AuthorizeExchangeAction(c echo.Context) error {
 
 	cc := c.(*util.EndpointContext)
 
-	loggedError := util.CheckIfLoggedIn(cc.Context)
-
-	if loggedError != nil {
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
-	}
-
-	_ = util.CheckForValidSession(cc.Context)
+	exchangeUUID := cc.Context.QueryParam("exchangeUUID")
+	exchangeAuthorized := cc.Context.QueryParam("exchangeAuthorized")
 
 	exchangeModel := new(models.ExchangeModel)
-	exchangeModelForm := new(models.ExchangeModel)
 
-	jsonBindError := cc.Context.Bind(exchangeModelForm)
-
-	if jsonBindError != nil {
-		raven.CaptureError(jsonBindError, nil)
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
-	}
-
-	findError := cc.AppContext.Database.Find(&exchangeModel, "uuid = ?", exchangeModel.UUID).Error
+	findError := cc.AppContext.Database.Find(&exchangeModel, "uuid = ?", exchangeUUID).Error
 
 	if findError != nil {
-		raven.CaptureError(findError, nil)
+		//raven.CaptureError(findError, nil)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeNotFoundError, Success: false})
 	}
 
-	exchangeModel.Authorized = exchangeModelForm.Authorized
+	convBool, convBoolError := strconv.ParseBool(exchangeAuthorized)
+
+	if convBoolError != nil {
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
+	}
+
+	exchangeModel.Authorized = convBool
 
 	cc.AppContext.Database.Save(&exchangeModel)
 
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: "", Success: true})
 }
 
+// Retrieve All Exchange Entries godoc
+// @Summary Retrieve all exchanges .
+// @Description Retrieves all exchanges and exchange information
+// @Accept  json
+// @Produce  json
+// @Tags Exchange
+// @Param Authorization header string true "Authentication header"
+// @Success 200 {object} responses.AllExchangesResponse ""
+// @Failure 200 {object} responses.AllExchangesResponse ""
+// @Router /v1/action/retrieve_all_exchanges [get]
 func RetrieveAllExchangesAction(c echo.Context) error {
 
 	cc := c.(*util.EndpointContext)
-
-	loggedError := util.CheckIfLoggedIn(cc.Context)
-
-	if loggedError != nil {
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
-	}
-
-	_ = util.CheckForValidSession(cc.Context)
 
 	var exchangeModels []models.ExchangeModel
 
@@ -133,7 +150,7 @@ func RetrieveAllExchangesAction(c echo.Context) error {
 
 	if findError != nil {
 		raven.CaptureError(findError, nil)
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
+		return c.JSON(http.StatusOK, &responses.AllExchangesResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
 	}
 
 	var sanitizedExchangeModels []models.ExchangeModel
@@ -149,20 +166,26 @@ func RetrieveAllExchangesAction(c echo.Context) error {
 	return c.JSON(http.StatusOK, &responses.AllExchangesResponse{Exchanges: sanitizedExchangeModels, ErrorMessage: "", Success: true})
 }
 
+// Retrieve Exchange Info By Exchange Temp Token Entries godoc
+// @Summary Retrieve exchange info by temp token .
+// @Description Retrieves all exchanges and exchange information
+// @Accept  json
+// @Produce  json
+// @Tags Exchange
+// @Param Authorization header string true "Authentication header"
+// @Param exchangeUUID query string true "Exchange UUID"
+// @Param exchangeTempAccessToken query string true "Exchange Temp Access Token"
+// @Success 200 {object} responses.AllExchangesResponse ""
+// @Failure 200 {object} responses.AllExchangesResponse ""
+// @Router /v1/action/retrieve_exchange_by_temp_token [get]
 func RetrieveExchangeInfoByExchangeTempTokenAction(c echo.Context) error {
 
 	cc := c.(*util.EndpointContext)
 
-	exchangeModelSubmitted := new(models.ExchangeModel)
+	exchangeUUID := cc.Context.QueryParam("exchangeUUID")
+	exchangeTempAccessToken := cc.Context.QueryParam("exchangeTempAccessToken")
 
-	jsonBindError := cc.Context.Bind(exchangeModelSubmitted)
-
-	if jsonBindError != nil {
-		raven.CaptureError(jsonBindError, nil)
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
-	}
-
-	if exchangeModelSubmitted.UUID == "" || exchangeModelSubmitted.TempAccessToken == "" {
+	if exchangeUUID == "" || exchangeTempAccessToken == "" {
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 	}
 
@@ -177,8 +200,8 @@ func RetrieveExchangeInfoByExchangeTempTokenAction(c echo.Context) error {
 
 	for _, element := range exchangeModels {
 
-		if element.UUID == exchangeModelSubmitted.UUID {
-			if element.TempAccessToken == exchangeModelSubmitted.TempAccessToken {
+		if element.UUID == exchangeUUID {
+			if element.TempAccessToken == exchangeTempAccessToken {
 				// Temp access token valid lets return the information
 				element.AccessToken = ""
 				var tradePairs []models.TradePairModel
@@ -194,6 +217,6 @@ func RetrieveExchangeInfoByExchangeTempTokenAction(c echo.Context) error {
 
 	// If we got here the exchange uuid is invalid
 
-	raven.CaptureMessage("Invalid Exchange UUID requested: "+exchangeModelSubmitted.UUID, nil)
+	raven.CaptureMessage("Invalid Exchange UUID requested: "+exchangeUUID, nil)
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
 }

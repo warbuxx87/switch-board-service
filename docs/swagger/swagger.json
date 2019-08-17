@@ -1,0 +1,792 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This service manages the authorization for exchanges and trade pairs",
+        "title": "Alkemi - Switch Board Service",
+        "contact": {
+            "name": "Raynaldo Rivera",
+            "url": "https://alkemi.ai",
+            "email": "royal@alkemi.ai"
+        },
+        "license": {
+            "name": "Proprietary"
+        },
+        "version": "1.0"
+    },
+    "host": "127.0.0.1:7020",
+    "basePath": "/",
+    "paths": {
+        "/v1/action/authorize_exchange": {
+            "get": {
+                "description": "Authorizes an exchange",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Authorizes an exchange",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Exchange UUID",
+                        "name": "exchangeUUID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Should the exchange be authorized",
+                        "name": "exchangeAuthorized",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.SuccessFailureResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/action/create_exchange": {
+            "post": {
+                "description": "Create a new exchange entry.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Create a new exchange entry.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Add Exchange Form",
+                        "name": "createExchangeModel",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/forms.CreateExchangeForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.SuccessFailureResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/action/create_service_key": {
+            "post": {
+                "description": "Creates a new service entry",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service"
+                ],
+                "summary": "Create a service key entry .",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Add Exchange Form",
+                        "name": "createServiceKeyModel",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/forms.CreateServiceForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.AllExchangesResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/action/create_trade_pair": {
+            "post": {
+                "description": "Create a trade pair entry.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "TradePair"
+                ],
+                "summary": "Create a trade pair entry.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Trade Pair Form",
+                        "name": "createTradePairModel",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/forms.CreateTradePairForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.SuccessFailureResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/action/remove_exchange": {
+            "get": {
+                "description": "Removes a existing exchange entry",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Removes a existing exchange entry.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Exchange UUID to Remove",
+                        "name": "exchangeUUID",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.SuccessFailureResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/action/remove_service_key": {
+            "get": {
+                "description": "Removes a service key entry",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service"
+                ],
+                "summary": "Removes a service key entry",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Service Key UUID to Remove",
+                        "name": "serviceKeyUUID",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.SuccessFailureResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/action/remove_trade_pair": {
+            "get": {
+                "description": "Removes a trade pair entry",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "TradePair"
+                ],
+                "summary": "Removes a trade pair entry.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Trade Pair UUID",
+                        "name": "tradePairUUID",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.SuccessFailureResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/action/retrieve_all_exchanges": {
+            "get": {
+                "description": "Retrieves all exchanges and exchange information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Retrieve all exchanges .",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.AllExchangesResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/action/retrieve_all_trade_pairs": {
+            "get": {
+                "description": "Retrieves all trade pair entries",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "TradePair"
+                ],
+                "summary": "Retrieve all trade pairs .",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.AllTradePairsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/action/retrieve_exchange_by_temp_token": {
+            "get": {
+                "description": "Retrieves all exchanges and exchange information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Retrieve exchange info by temp token .",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Exchange UUID",
+                        "name": "exchangeUUID",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Exchange Temp Access Token",
+                        "name": "exchangeTempAccessToken",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.AllExchangesResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/generate_new_temp_token": {
+            "post": {
+                "description": "Generate a new temp token for a exchange",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Generate a new temp token for a exchange",
+                "parameters": [
+                    {
+                        "description": "Exchange Access Credentials",
+                        "name": "exchangeAccessCredentialsForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/forms.AccessCredentialsForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.SuccessFailureResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/login": {
+            "post": {
+                "description": "Login endpoint to receive a JWT token to authorize against protected endpoints.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Login and receive JWT token.",
+                "parameters": [
+                    {
+                        "description": "User Credentials",
+                        "name": "user_credentials",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/forms.LoginForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.LoginResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/revoke_temp_access_token": {
+            "post": {
+                "description": "Revokes an exchanges temp access token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Revokes an exchanges temp access token",
+                "parameters": [
+                    {
+                        "description": "Exchange Access Credentials",
+                        "name": "exchangeAccessCredentialsForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/forms.AccessCredentialsForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.SuccessFailureResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/service/service_retrieve_all_exchanges": {
+            "post": {
+                "description": "Retrieves all exchanges and exchange information",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service-Endpoints"
+                ],
+                "summary": "Retrieve all exchanges .",
+                "parameters": [
+                    {
+                        "description": "Service Key Credentials",
+                        "name": "serviceKeyCredentialForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/forms.AccessCredentialsForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.AllExchangesResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/service/service_retrieve_all_trade_pairs": {
+            "post": {
+                "description": "Retrieves all trade pair entries",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service-Endpoints"
+                ],
+                "summary": "Retrieve all trade pair entries .",
+                "parameters": [
+                    {
+                        "description": "Service Key Credentials",
+                        "name": "accessCredentialForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/forms.AccessCredentialsForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.AllExchangesResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/validate_access": {
+            "post": {
+                "description": "Validates exchanges and service credentials",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Public"
+                ],
+                "summary": "Validates exchanges and service credentials",
+                "parameters": [
+                    {
+                        "description": "Exchange Access Credentials",
+                        "name": "exchangeAccessCredentialForm",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/forms.AccessCredentialsForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.SuccessFailureResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "forms.AccessCredentialsForm": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "forms.CreateExchangeForm": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "forms.CreateServiceForm": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "forms.CreateTradePairForm": {
+            "type": "object",
+            "properties": {
+                "base_asset": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "secondary_asset": {
+                    "type": "string"
+                }
+            }
+        },
+        "forms.LoginForm": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ExchangeModel": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "authorized": {
+                    "type": "boolean"
+                },
+                "exchange_authorized_trade_pairs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.TradePairModel"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "temp_access_token": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.TradePairModel": {
+            "type": "object",
+            "properties": {
+                "base_asset": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "secondary_asset": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
+        "responses.AllExchangesResponse": {
+            "type": "object",
+            "properties": {
+                "error_message": {
+                    "type": "string"
+                },
+                "exchanges": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ExchangeModel"
+                    }
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "responses.AllTradePairsResponse": {
+            "type": "object",
+            "properties": {
+                "error_message": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                },
+                "trade_pairs": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.TradePairModel"
+                    }
+                }
+            }
+        },
+        "responses.LoginResponse": {
+            "type": "object",
+            "properties": {
+                "error_message": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                },
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "responses.SuccessFailureResponse": {
+            "type": "object",
+            "properties": {
+                "error_message": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

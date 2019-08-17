@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/forms"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/models"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/responses"
 	"github.com/getsentry/raven-go"
@@ -11,21 +12,24 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func AddTradePairAction(c echo.Context) error {
+// Create Trade Pair godoc
+// @Summary Create a trade pair entry.
+// @Description Create a trade pair entry.
+// @Accept  json
+// @Produce  json
+// @Tags TradePair
+// @Param Authorization header string true "Authentication header"
+// @Param createTradePairModel body forms.CreateTradePairForm true "Trade Pair Form"
+// @Success 200 {object} responses.SuccessFailureResponse ""
+// @Failure 200 {object} responses.SuccessFailureResponse ""
+// @Router /v1/action/create_trade_pair [post]
+func CreateTradePairAction(c echo.Context) error {
 
 	cc := c.(*util.EndpointContext)
 
-	loggedError := util.CheckIfLoggedIn(cc.Context)
+	tradePairForm := new(forms.CreateTradePairForm)
 
-	if loggedError != nil {
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
-	}
-
-	_ = util.CheckForValidSession(cc.Context)
-
-	tradePairModel := new(models.TradePairModel)
-
-	jsonBindError := cc.Context.Bind(tradePairModel)
+	jsonBindError := cc.Context.Bind(tradePairForm)
 
 	if jsonBindError != nil {
 		raven.CaptureError(jsonBindError, nil)
@@ -33,9 +37,14 @@ func AddTradePairAction(c echo.Context) error {
 
 	}
 
-	tradePairModel.UUID = uuid.NewV4().String()
+	var tradePairModel models.TradePairModel
 
-	createError := cc.AppContext.Database.Create(&tradePairModel).Error
+	tradePairModel.UUID = uuid.NewV4().String()
+	tradePairModel.Name = tradePairForm.Name
+	tradePairModel.BaseAsset = tradePairForm.BaseAsset
+	tradePairModel.SecondaryAsset = tradePairForm.SecondaryAsset
+
+	createError := cc.AppContext.Database.Create(&tradePairForm).Error
 
 	if createError != nil {
 		raven.CaptureError(createError, nil)
@@ -46,19 +55,22 @@ func AddTradePairAction(c echo.Context) error {
 
 }
 
+// Remove Trade Pair Entry godoc
+// @Summary Removes a trade pair entry.
+// @Description Removes a trade pair entry
+// @Accept  json
+// @Produce  json
+// @Tags TradePair
+// @Param Authorization header string true "Authentication header"
+// @Param tradePairUUID query string true "Trade Pair UUID"
+// @Success 200 {object} responses.SuccessFailureResponse ""
+// @Failure 200 {object} responses.SuccessFailureResponse ""
+// @Router /v1/action/remove_trade_pair [get]
 func RemoveTradePairAction(c echo.Context) error {
 
 	cc := c.(*util.EndpointContext)
 
-	loggedError := util.CheckIfLoggedIn(cc.Context)
-
-	tradePairUUID := cc.Context.Param("tradePairUUID")
-
-	if loggedError != nil {
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
-	}
-
-	_ = util.CheckForValidSession(cc.Context)
+	tradePairUUID := cc.Context.QueryParam("tradePairUUID")
 
 	tradePairModel := new(models.TradePairModel)
 
@@ -96,17 +108,19 @@ func RemoveTradePairAction(c echo.Context) error {
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: "", Success: true})
 }
 
+// Retrieve All Trade Pair Entries godoc
+// @Summary Retrieve all trade pairs .
+// @Description Retrieves all trade pair entries
+// @Accept  json
+// @Produce  json
+// @Tags TradePair
+// @Param Authorization header string true "Authentication header"
+// @Success 200 {object} responses.AllTradePairsResponse ""
+// @Failure 200 {object} responses.AllTradePairsResponse ""
+// @Router /v1/action/retrieve_all_trade_pairs [get]
 func RetrieveAllTradePairs(c echo.Context) error {
 
 	cc := c.(*util.EndpointContext)
-
-	loggedError := util.CheckIfLoggedIn(cc.Context)
-
-	if loggedError != nil {
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
-	}
-
-	_ = util.CheckForValidSession(cc.Context)
 
 	var tradePairModels []models.TradePairModel
 
@@ -114,7 +128,7 @@ func RetrieveAllTradePairs(c echo.Context) error {
 
 	if findError != nil {
 		raven.CaptureError(findError, nil)
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRetrievingTradePairsError, Success: false})
+		return c.JSON(http.StatusOK, &responses.AllTradePairsResponse{ErrorMessage: util.StrRetrievingTradePairsError, Success: false})
 	}
 
 	return c.JSON(http.StatusOK, &responses.AllTradePairsResponse{TradePairs: tradePairModels, ErrorMessage: "", Success: true})

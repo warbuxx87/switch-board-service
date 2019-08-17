@@ -2,28 +2,27 @@ package util
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/tkanos/gonfig"
 )
 
 type Configuration struct {
-
 	ListenIp   string
 	ListenPort int
 
 	SentryUrl string
 
-	DatabaseName string
+	DatabaseName     string
 	DatabaseUsername string
 	DatabasePassword string
 
+	JWTSecret string
 	// 0 = Info, 1 = Debug
 	LogLevel int
 }
 
 type ActionResult struct {
-
 }
 
 func LoadConfigurationFile() (*Configuration, error) {
