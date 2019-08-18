@@ -26,6 +26,13 @@ definitions:
       secondary_asset:
         type: string
     type: object
+  forms.ExchangeTradePairAssociationForm:
+    properties:
+      exchange_uuid:
+        type: string
+      trade_pair_uuid:
+        type: string
+    type: object
   forms.LoginForm:
     properties:
       password:
@@ -170,6 +177,34 @@ paths:
       summary: Create a new exchange entry.
       tags:
       - Exchange
+  /v1/action/create_exchange_trade_pair_association:
+    post:
+      consumes:
+      - application/json
+      description: Associates a exchange and trade pair
+      parameters:
+      - description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Exchange Trade Pair Association
+        in: body
+        name: exchangeTradePairAssociationForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.ExchangeTradePairAssociationForm'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.SuccessFailureResponse'
+      summary: Associates a exchange and trade pair
+      tags:
+      - TradePair
   /v1/action/create_service_key:
     post:
       consumes:
@@ -252,6 +287,34 @@ paths:
       summary: Removes a existing exchange entry.
       tags:
       - Exchange
+  /v1/action/remove_exchange_trade_pair_association:
+    post:
+      consumes:
+      - application/json
+      description: Removes a exchange and trade pair association
+      parameters:
+      - description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Exchange Trade Pair Association
+        in: body
+        name: exchangeTradePairAssociationForm
+        required: true
+        schema:
+          $ref: '#/definitions/forms.ExchangeTradePairAssociationForm'
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.SuccessFailureResponse'
+      summary: Removes a exchange and trade pair association
+      tags:
+      - TradePair
   /v1/action/remove_service_key:
     get:
       consumes:

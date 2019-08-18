@@ -115,8 +115,6 @@ func main() {
 			}
 		})
 
-		e.Static("/static", "assets")
-
 		e.Use(session.Middleware(sessions.NewCookieStore([]byte(uuid.NewV4().String()))))
 
 		e.Use(middleware.Logger())
@@ -129,9 +127,6 @@ func main() {
 		}))
 
 		templates := make(map[string]*template.Template)
-
-		templates["login.html"] = template.Must(template.ParseFiles("templates/login.html", "templates/base.html"))
-		templates["dashboard.html"] = template.Must(template.ParseFiles("templates/dashboard.html", "templates/base.html"))
 
 		e.Renderer = &util.TemplateRegistry{
 			Templates: templates,
@@ -165,7 +160,10 @@ func main() {
 		// Trade pair
 		r.POST("/create_trade_pair", api.CreateTradePairAction)
 		r.GET("/remove_trade_pair", api.RemoveTradePairAction)
-		r.GET("/retrieve_all_trade_pairs", api.RetrieveAllTradePairs)
+		r.GET("/retrieve_all_trade_pairs", api.RetrieveAllTradePairsAction)
+		r.POST("/create_exchange_trade_pair_association", api.CreateExchangeTradePairsAssociationAction)
+		r.POST("/remove_exchange_trade_pair_association", api.RemoveExchangeTradePairsAssociationAction)
+
 
 		// Service Keys
 		r.POST("/create_service_key", api.CreateServiceKeyAction)

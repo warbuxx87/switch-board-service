@@ -82,7 +82,7 @@ func RemoveServiceKeyAction(c echo.Context) error {
 
 	if deleteError != nil {
 		raven.CaptureError(deleteError, nil)
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRemoveExchangeFailedError, Success: false})
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRemoveServiceKeyFailedError, Success: false})
 	}
 
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: "", Success: true})

@@ -15,13 +15,13 @@ var StrExchangeAccessTokenInvalid = "Error exchange id or access token is invali
 
 var StrAddTradePairError = "Could not create new trade pair model."
 var StrTradePairNotFoundError = "Trade pair with UUID does not exist."
+var StrTradePairAlreadyAssociatedError = "Trade Pair already associated with exchange."
 var StrRemoveTradePairInUseError = "Could not remove trade pair has it is currently associated with an exchange."
 var StrRemoveTradePairFailedError = "Error occurred while removing trade pair."
 var StrRetrievingTradePairsError = "Error occurred while trying to retrieve all trade pairs."
+var StrTradePairAssociationDoesNotExistError = "Trade pair association does not exist."
 
 var StrAddServiceKeyFailedError = "Error while trying to create service key."
 var StrRemoveServiceKeyFailedError = "Error while trying to remove service key."
 var StrServiceKeysCouldNotBeRetrieved = "Error occurred while attempting to retrieve service keys."
 var StrServiceAccessTokenInvalid = "Error exchange id or access token is invalid. "
-
-

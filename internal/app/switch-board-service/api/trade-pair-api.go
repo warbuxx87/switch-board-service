@@ -44,7 +44,7 @@ func CreateTradePairAction(c echo.Context) error {
 	tradePairModel.BaseAsset = tradePairForm.BaseAsset
 	tradePairModel.SecondaryAsset = tradePairForm.SecondaryAsset
 
-	createError := cc.AppContext.Database.Create(&tradePairForm).Error
+	createError := cc.AppContext.Database.Create(&tradePairModel).Error
 
 	if createError != nil {
 		raven.CaptureError(createError, nil)
@@ -92,8 +92,14 @@ func RemoveTradePairAction(c echo.Context) error {
 
 	for _, element := range exchangeModels {
 
-		if element.UUID == tradePairModel.UUID {
-			return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRemoveTradePairInUseError, Success: false})
+		var tradePairs []models.TradePairModel
+		cc.AppContext.Database.Model(&element).Related(&tradePairs, "AuthorizedTradePairs")
+
+		for _, tradePairElement := range tradePairs {
+			if tradePairElement.UUID == tradePairModel.UUID {
+				return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRemoveTradePairInUseError, Success: false})
+			}
+
 		}
 
 	}
@@ -118,7 +124,7 @@ func RemoveTradePairAction(c echo.Context) error {
 // @Success 200 {object} responses.AllTradePairsResponse ""
 // @Failure 200 {object} responses.AllTradePairsResponse ""
 // @Router /v1/action/retrieve_all_trade_pairs [get]
-func RetrieveAllTradePairs(c echo.Context) error {
+func RetrieveAllTradePairsAction(c echo.Context) error {
 
 	cc := c.(*util.EndpointContext)
 
@@ -132,4 +138,143 @@ func RetrieveAllTradePairs(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, &responses.AllTradePairsResponse{TradePairs: tradePairModels, ErrorMessage: "", Success: true})
+}
+
+// Create a  Associate Exchange and Trade Pair godoc
+// @Summary Associates a exchange and trade pair
+// @Description Associates a exchange and trade pair
+// @Accept  json
+// @Produce  json
+// @Tags TradePair
+// @Param Authorization header string true "Authentication header"
+// @Param exchangeTradePairAssociationForm body forms.ExchangeTradePairAssociationForm true "Exchange Trade Pair Association"
+// @Success 200 {object} responses.SuccessFailureResponse ""
+// @Failure 200 {object} responses.SuccessFailureResponse ""
+// @Router /v1/action/create_exchange_trade_pair_association [post]
+func CreateExchangeTradePairsAssociationAction(c echo.Context) error {
+
+	cc := c.(*util.EndpointContext)
+
+	tradePairAssociationForm := new(forms.ExchangeTradePairAssociationForm)
+
+	jsonBindError := cc.Context.Bind(tradePairAssociationForm)
+
+	if jsonBindError != nil {
+		raven.CaptureError(jsonBindError, nil)
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
+
+	}
+
+	var exchangeModels []models.ExchangeModel
+
+	findError := cc.AppContext.Database.Find(&exchangeModels).Error
+
+	if findError != nil {
+		raven.CaptureError(findError, nil)
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
+	}
+
+	for _, element := range exchangeModels {
+
+		if element.UUID == tradePairAssociationForm.ExchangeUUID {
+
+			var tradePairs []models.TradePairModel
+			cc.AppContext.Database.Model(&element).Related(&tradePairs, "AuthorizedTradePairs")
+			element.AuthorizedTradePairs = tradePairs
+
+			for _, tradePairElement := range tradePairs {
+				if tradePairElement.UUID == tradePairAssociationForm.TradePairUUID {
+					return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrTradePairAlreadyAssociatedError, Success: false})
+				}
+			}
+
+			tradePairModel := new(models.TradePairModel)
+
+			findError := cc.AppContext.Database.Find(&tradePairModel, "uuid = ?", tradePairAssociationForm.TradePairUUID).Error
+
+			if findError != nil {
+				raven.CaptureError(findError, nil)
+				return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrTradePairNotFoundError, Success: false})
+			}
+
+			element.AuthorizedTradePairs = append(element.AuthorizedTradePairs, *tradePairModel)
+
+			cc.AppContext.Database.Save(&element)
+
+			return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: "", Success: true})
+
+		}
+	}
+
+	// If we got here the exchange uuid is invalid
+
+	raven.CaptureMessage("Invalid Exchange UUID requested: "+tradePairAssociationForm.ExchangeUUID, nil)
+	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
+}
+
+// Removes a  Associate Exchange and Trade Pair godoc
+// @Summary Removes a exchange and trade pair association
+// @Description Removes a exchange and trade pair association
+// @Accept  json
+// @Produce  json
+// @Tags TradePair
+// @Param Authorization header string true "Authentication header"
+// @Param exchangeTradePairAssociationForm body forms.ExchangeTradePairAssociationForm true "Exchange Trade Pair Association"
+// @Success 200 {object} responses.SuccessFailureResponse ""
+// @Failure 200 {object} responses.SuccessFailureResponse ""
+// @Router /v1/action/remove_exchange_trade_pair_association [post]
+func RemoveExchangeTradePairsAssociationAction(c echo.Context) error {
+	cc := c.(*util.EndpointContext)
+
+	tradePairAssociationForm := new(forms.ExchangeTradePairAssociationForm)
+
+	jsonBindError := cc.Context.Bind(tradePairAssociationForm)
+
+	if jsonBindError != nil {
+		raven.CaptureError(jsonBindError, nil)
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
+
+	}
+
+	var exchangeModels []models.ExchangeModel
+
+	findError := cc.AppContext.Database.Find(&exchangeModels).Error
+
+	if findError != nil {
+		raven.CaptureError(findError, nil)
+		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
+	}
+
+	for _, element := range exchangeModels {
+
+		if element.UUID == tradePairAssociationForm.ExchangeUUID {
+
+			var tradePairs []models.TradePairModel
+			cc.AppContext.Database.Model(&element).Related(&tradePairs, "AuthorizedTradePairs")
+
+			for tradePairIndex, tradePairElement := range tradePairs {
+				if tradePairElement.UUID == tradePairAssociationForm.TradePairUUID {
+
+					tradePairs = append(tradePairs[:tradePairIndex], tradePairs[tradePairIndex+1:]...)
+
+					element.AuthorizedTradePairs = tradePairs
+
+					var deleteReturn []string
+
+					// Note: This is the current way to do this in gorm we need to be careful to avoid security issues.
+					cc.AppContext.Database.Raw("DELETE FROM `exchange_authorized_trade_pairs` WHERE `exchange_model_id` = ? AND `trade_pair_model_id` = ?", element.ID, tradePairElement.ID).Scan(&deleteReturn)
+
+					return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: "", Success: true})
+				}
+			}
+
+			return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrTradePairAssociationDoesNotExistError, Success: false})
+
+		}
+	}
+
+	// If we got here the exchange uuid is invalid
+
+	raven.CaptureMessage("Invalid Exchange UUID requested: "+tradePairAssociationForm.ExchangeUUID, nil)
+	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
 }
