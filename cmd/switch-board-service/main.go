@@ -140,6 +140,7 @@ func main() {
 		e.POST("/v1/login", api.LoginAction)
 		e.POST("/v1/generate_new_temp_token", api.GenerateNewTempTokenAction)
 		e.POST("/v1/revoke_temp_access_token", api.RevokeTempAccessTokenAction)
+		e.POST("/v1/retrieve_exchange_by_temp_token", api.RetrieveExchangeInfoByExchangeTempTokenAction)
 
 		// Services
 		e.POST("/v1/validate_access", api.ValidateAccessAction)
@@ -155,7 +156,6 @@ func main() {
 		r.GET("/remove_exchange", api.RemoveExchangeAction)
 		r.GET("/authorize_exchange", api.AuthorizeExchangeAction)
 		r.GET("/retrieve_all_exchanges", api.RetrieveAllExchangesAction)
-		r.GET("/retrieve_exchange_by_temp_token", api.RetrieveExchangeInfoByExchangeTempTokenAction)
 
 		// Trade pair
 		r.POST("/create_trade_pair", api.CreateTradePairAction)
@@ -164,11 +164,9 @@ func main() {
 		r.POST("/create_exchange_trade_pair_association", api.CreateExchangeTradePairsAssociationAction)
 		r.POST("/remove_exchange_trade_pair_association", api.RemoveExchangeTradePairsAssociationAction)
 
-
 		// Service Keys
 		r.POST("/create_service_key", api.CreateServiceKeyAction)
 		r.GET("/remove_service_key", api.RemoveServiceKeyAction)
-
 
 		e.Logger.Fatal(e.Start(config.ListenIp + ":" + strconv.Itoa(config.ListenPort)))
 

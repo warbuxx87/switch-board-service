@@ -172,20 +172,24 @@ func RetrieveAllExchangesAction(c echo.Context) error {
 // @Accept  json
 // @Produce  json
 // @Tags Exchange
-// @Param Authorization header string true "Authentication header"
-// @Param exchangeUUID query string true "Exchange UUID"
-// @Param exchangeTempAccessToken query string true "Exchange Temp Access Token"
+// @Param exchangeAccessCredentialsForm body forms.AccessCredentialsForm true "Exchange Access Credentials"
 // @Success 200 {object} responses.AllExchangesResponse ""
 // @Failure 200 {object} responses.AllExchangesResponse ""
-// @Router /v1/action/retrieve_exchange_by_temp_token [get]
+// @Router /v1/action/retrieve_exchange_by_temp_token [post]
 func RetrieveExchangeInfoByExchangeTempTokenAction(c echo.Context) error {
 
 	cc := c.(*util.EndpointContext)
 
-	exchangeUUID := cc.Context.QueryParam("exchangeUUID")
-	exchangeTempAccessToken := cc.Context.QueryParam("exchangeTempAccessToken")
+	accessCredentialsForm := new(forms.AccessCredentialsForm)
 
-	if exchangeUUID == "" || exchangeTempAccessToken == "" {
+	jsonBindError := cc.Context.Bind(accessCredentialsForm)
+
+	if jsonBindError != nil {
+		raven.CaptureError(jsonBindError, nil)
+		return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
+	}
+
+	if accessCredentialsForm.UUID == "" || accessCredentialsForm.AccessToken == "" {
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 	}
 
@@ -200,8 +204,8 @@ func RetrieveExchangeInfoByExchangeTempTokenAction(c echo.Context) error {
 
 	for _, element := range exchangeModels {
 
-		if element.UUID == exchangeUUID {
-			if element.TempAccessToken == exchangeTempAccessToken {
+		if element.UUID == accessCredentialsForm.UUID {
+			if element.TempAccessToken == accessCredentialsForm.AccessToken {
 				// Temp access token valid lets return the information
 				element.AccessToken = ""
 				var tradePairs []models.TradePairModel
@@ -217,6 +221,6 @@ func RetrieveExchangeInfoByExchangeTempTokenAction(c echo.Context) error {
 
 	// If we got here the exchange uuid is invalid
 
-	raven.CaptureMessage("Invalid Exchange UUID requested: "+exchangeUUID, nil)
+	raven.CaptureMessage("Invalid Exchange UUID requested: "+accessCredentialsForm.UUID, nil)
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
 }
