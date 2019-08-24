@@ -173,8 +173,8 @@ func RetrieveAllExchangesAction(c echo.Context) error {
 // @Produce  json
 // @Tags Exchange
 // @Param exchangeAccessCredentialsForm body forms.AccessCredentialsForm true "Exchange Access Credentials"
-// @Success 200 {object} responses.AllExchangesResponse ""
-// @Failure 200 {object} responses.AllExchangesResponse ""
+// @Success 200 {object} responses.ExchangeInfoResponse ""
+// @Failure 200 {object} responses.ExchangeInfoResponse ""
 // @Router /v1/action/retrieve_exchange_by_temp_token [post]
 func RetrieveExchangeInfoByExchangeTempTokenAction(c echo.Context) error {
 
