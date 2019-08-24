@@ -92,8 +92,8 @@ func ValidateAccessAction(c echo.Context) error {
 // @Produce  json
 // @Tags Public
 // @Param exchangeAccessCredentialsForm body forms.AccessCredentialsForm true "Exchange Access Credentials"
-// @Success 200 {object} responses.SuccessFailureResponse ""
-// @Failure 200 {object} responses.SuccessFailureResponse ""
+// @Success 200 {object} responses.ExchangeInfoResponse ""
+// @Failure 200 {object} responses.ExchangeInfoResponse ""
 // @Router /v1/generate_new_temp_token [post]
 func GenerateNewTempTokenAction(c echo.Context) error {
 
@@ -105,11 +105,11 @@ func GenerateNewTempTokenAction(c echo.Context) error {
 
 	if jsonBindError != nil {
 		raven.CaptureError(jsonBindError, nil)
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
+		return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 	}
 
 	if accessCredentialsForm.UUID == "" || accessCredentialsForm.AccessToken == "" {
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
+		return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 	}
 
 	var exchangeModels []models.ExchangeModel
@@ -118,7 +118,7 @@ func GenerateNewTempTokenAction(c echo.Context) error {
 
 	if findError != nil {
 		raven.CaptureError(findError, nil)
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
+		return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
 	}
 
 	for _, element := range exchangeModels {
@@ -133,7 +133,7 @@ func GenerateNewTempTokenAction(c echo.Context) error {
 
 				if findError != nil {
 					raven.CaptureError(findError, nil)
-					return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeNotFoundError, Success: false})
+					return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: util.StrExchangeNotFoundError, Success: false})
 				}
 
 				exchangeModel.TempAccessToken = uuid.NewV4().String()
@@ -145,7 +145,7 @@ func GenerateNewTempTokenAction(c echo.Context) error {
 				return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: "", Success: true, Exchange: *exchangeModel})
 			} else {
 				// Invalid access token
-				return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
+				return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
 			}
 		}
 	}

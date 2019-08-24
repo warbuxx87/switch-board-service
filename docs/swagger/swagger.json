@@ -528,7 +528,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.SuccessFailureResponse"
+                            "$ref": "#/definitions/responses.ExchangeInfoResponse"
                         }
                     }
                 }
@@ -848,6 +848,21 @@
                     "items": {
                         "$ref": "#/definitions/models.TradePairModel"
                     }
+                }
+            }
+        },
+        "responses.ExchangeInfoResponse": {
+            "type": "object",
+            "properties": {
+                "error_message": {
+                    "type": "string"
+                },
+                "exchange": {
+                    "type": "object",
+                    "$ref": "#/definitions/models.ExchangeModel"
+                },
+                "success": {
+                    "type": "boolean"
                 }
             }
         },

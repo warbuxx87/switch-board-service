@@ -90,6 +90,16 @@ definitions:
           $ref: '#/definitions/models.TradePairModel'
         type: array
     type: object
+  responses.ExchangeInfoResponse:
+    properties:
+      error_message:
+        type: string
+      exchange:
+        $ref: '#/definitions/models.ExchangeModel'
+        type: object
+      success:
+        type: boolean
+    type: object
   responses.LoginResponse:
     properties:
       error_message:
@@ -459,7 +469,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/responses.SuccessFailureResponse'
+            $ref: '#/definitions/responses.ExchangeInfoResponse'
       summary: Generate a new temp token for a exchange
       tags:
       - Public
