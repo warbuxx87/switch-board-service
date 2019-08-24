@@ -420,26 +420,18 @@ paths:
       tags:
       - TradePair
   /v1/action/retrieve_exchange_by_temp_token:
-    get:
+    post:
       consumes:
       - application/json
       description: Retrieves all exchanges and exchange information
       parameters:
-      - description: Authentication header
-        in: header
-        name: Authorization
+      - description: Exchange Access Credentials
+        in: body
+        name: exchangeAccessCredentialsForm
         required: true
-        type: string
-      - description: Exchange UUID
-        in: query
-        name: exchangeUUID
-        required: true
-        type: string
-      - description: Exchange Temp Access Token
-        in: query
-        name: exchangeTempAccessToken
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/forms.AccessCredentialsForm'
+          type: object
       produces:
       - application/json
       responses:
