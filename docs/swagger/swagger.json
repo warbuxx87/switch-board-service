@@ -182,7 +182,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.AllExchangesResponse"
+                            "$ref": "#/definitions/responses.ServiceKeyResponse"
                         }
                     }
                 }
@@ -482,7 +482,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.AllExchangesResponse"
+                            "$ref": "#/definitions/responses.ExchangeInfoResponse"
                         }
                     }
                 }
@@ -866,6 +866,20 @@
                 },
                 "token": {
                     "type": "string"
+                }
+            }
+        },
+        "responses.ServiceKeyResponse": {
+            "type": "object",
+            "properties": {
+                "error_message": {
+                    "type": "string"
+                },
+                "service_key": {
+                    "type": "string"
+                },
+                "success": {
+                    "type": "boolean"
                 }
             }
         },

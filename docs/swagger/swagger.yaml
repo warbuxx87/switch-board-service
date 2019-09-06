@@ -109,6 +109,15 @@ definitions:
       token:
         type: string
     type: object
+  responses.ServiceKeyResponse:
+    properties:
+      error_message:
+        type: string
+      service_key:
+        type: string
+      success:
+        type: boolean
+    type: object
   responses.SuccessFailureResponse:
     properties:
       error_message:
@@ -239,7 +248,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/responses.AllExchangesResponse'
+            $ref: '#/definitions/responses.ServiceKeyResponse'
       summary: Create a service key entry .
       tags:
       - Service
@@ -438,7 +447,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/responses.AllExchangesResponse'
+            $ref: '#/definitions/responses.ExchangeInfoResponse'
       summary: Retrieve exchange info by temp token .
       tags:
       - Exchange
