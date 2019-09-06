@@ -19,8 +19,8 @@ import (
 // @Tags Service
 // @Param Authorization header string true "Authentication header"
 // @Param createServiceKeyModel body forms.CreateServiceForm true "Add Exchange Form"
-// @Success 200 {object} responses.AllExchangesResponse ""
-// @Failure 200 {object} responses.AllExchangesResponse ""
+// @Success 200 {object} responses.ServiceKeyResponse ""
+// @Failure 200 {object} responses.ServiceKeyResponse ""
 // @Router /v1/action/create_service_key [post]
 func CreateServiceKeyAction(c echo.Context) error {
 
@@ -32,7 +32,7 @@ func CreateServiceKeyAction(c echo.Context) error {
 
 	if jsonBindError != nil {
 		raven.CaptureError(jsonBindError, nil)
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
+		return c.JSON(http.StatusOK, &responses.ServiceKeyResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 	}
 
 	var serviceKeyModel models.ServiceKeyModel
@@ -45,10 +45,10 @@ func CreateServiceKeyAction(c echo.Context) error {
 
 	if createError != nil {
 		raven.CaptureError(createError, nil)
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrAddServiceKeyFailedError, Success: false})
+		return c.JSON(http.StatusOK, &responses.ServiceKeyResponse{ErrorMessage: util.StrAddServiceKeyFailedError, Success: false})
 	}
 
-	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: "", Success: true})
+	return c.JSON(http.StatusOK, &responses.ServiceKeyResponse{ErrorMessage: "", Success: true})
 
 }
 
