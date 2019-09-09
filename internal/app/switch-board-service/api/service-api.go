@@ -37,8 +37,11 @@ func CreateServiceKeyAction(c echo.Context) error {
 
 	var serviceKeyModel models.ServiceKeyModel
 
-	serviceKeyModel.UUID = uuid.NewV4().String()
-	serviceKeyModel.AccessToken = uuid.NewV4().String()
+	newUUID := uuid.NewV4().String()
+	newKey := uuid.NewV4().String()
+
+	serviceKeyModel.UUID = newUUID
+	serviceKeyModel.AccessToken = newKey
 	serviceKeyModel.Name = serviceKeyForm.Name
 
 	createError := cc.AppContext.Database.Create(&serviceKeyModel).Error
@@ -48,7 +51,7 @@ func CreateServiceKeyAction(c echo.Context) error {
 		return c.JSON(http.StatusOK, &responses.ServiceKeyResponse{ErrorMessage: util.StrAddServiceKeyFailedError, Success: false})
 	}
 
-	return c.JSON(http.StatusOK, &responses.ServiceKeyResponse{ErrorMessage: "", Success: true})
+	return c.JSON(http.StatusOK, &responses.ServiceKeyResponse{ErrorMessage: "", Success: true, ServiceUUID: newUUID, ServiceKey: newKey})
 
 }
 
