@@ -5,7 +5,7 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/models"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
 	"encoding/gob"
-	"github.com/getsentry/raven-go"
+	"github.com/getsentry/sentry-go"
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -91,7 +91,9 @@ func main() {
 	dataContext.Config = config
 	dataContext.Database = databaseConnection
 
-	sentrySetDSNError := raven.SetDSN(config.SentryUrl)
+	sentrySetDSNError := sentry.Init(sentry.ClientOptions{
+        	Dsn: config.SentryUrl,
+	})
 
 	if sentrySetDSNError != nil {
 		logrus.WithFields(logrus.Fields{}).Error(sentrySetDSNError)
@@ -167,6 +169,6 @@ func main() {
 	databaseCloseError := dataContext.Database.Close()
 
 	if databaseCloseError != nil {
-		raven.CaptureError(databaseCloseError, nil)
+		sentry.CaptureException(databaseCloseError)
 	}
 }
