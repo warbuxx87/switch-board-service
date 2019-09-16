@@ -5,7 +5,7 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/models"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/responses"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
-	"github.com/getsentry/raven-go"
+	"github.com/getsentry/sentry-go"
 	"github.com/labstack/echo/v4"
 	uuid "github.com/satori/go.uuid"
 	"net/http"
@@ -31,7 +31,7 @@ func CreateServiceKeyAction(c echo.Context) error {
 	jsonBindError := cc.Context.Bind(serviceKeyForm)
 
 	if jsonBindError != nil {
-		raven.CaptureError(jsonBindError, nil)
+		sentry.CaptureException(jsonBindError)
 		return c.JSON(http.StatusOK, &responses.ServiceKeyResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 	}
 
@@ -47,7 +47,7 @@ func CreateServiceKeyAction(c echo.Context) error {
 	createError := cc.AppContext.Database.Create(&serviceKeyModel).Error
 
 	if createError != nil {
-		raven.CaptureError(createError, nil)
+		sentry.CaptureException(createError)
 		return c.JSON(http.StatusOK, &responses.ServiceKeyResponse{ErrorMessage: util.StrAddServiceKeyFailedError, Success: false})
 	}
 
@@ -77,14 +77,14 @@ func RemoveServiceKeyAction(c echo.Context) error {
 	findError := cc.AppContext.Database.Find(&serviceKeyModel, "uuid = ?", serviceKeyUUID).Error
 
 	if findError != nil {
-		raven.CaptureError(findError, nil)
+		sentry.CaptureException(findError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeNotFoundError, Success: false})
 	}
 
 	deleteError := cc.AppContext.Database.Unscoped().Delete(&serviceKeyModel).Error
 
 	if deleteError != nil {
-		raven.CaptureError(deleteError, nil)
+		sentry.CaptureException(deleteError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRemoveServiceKeyFailedError, Success: false})
 	}
 
@@ -110,7 +110,7 @@ func ServiceRetrieveAllExchangesAction(c echo.Context) error {
 	jsonBindError := cc.Context.Bind(serviceKeyModelSubmitted)
 
 	if jsonBindError != nil {
-		raven.CaptureError(jsonBindError, nil)
+		sentry.CaptureException(jsonBindError)
 		return c.JSON(http.StatusOK, &responses.AllExchangesResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 	}
 
@@ -123,7 +123,7 @@ func ServiceRetrieveAllExchangesAction(c echo.Context) error {
 	findError := cc.AppContext.Database.Find(&serviceKeyModels).Error
 
 	if findError != nil {
-		raven.CaptureError(findError, nil)
+		sentry.CaptureException(findError)
 		return c.JSON(http.StatusOK, &responses.AllExchangesResponse{ErrorMessage: util.StrServiceKeysCouldNotBeRetrieved, Success: false})
 	}
 
@@ -138,7 +138,7 @@ func ServiceRetrieveAllExchangesAction(c echo.Context) error {
 				findError := cc.AppContext.Database.Find(&exchangeModels).Error
 
 				if findError != nil {
-					raven.CaptureError(findError, nil)
+					sentry.CaptureException(findError)
 					return c.JSON(http.StatusOK, &responses.AllExchangesResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
 				}
 
@@ -161,7 +161,7 @@ func ServiceRetrieveAllExchangesAction(c echo.Context) error {
 	}
 
 	// If we got here the exchange uuid is invalid
-	raven.CaptureMessage("Invalid Service UUID requested: "+serviceKeyModelSubmitted.UUID, nil)
+	sentry.CaptureMessage("Invalid Service UUID requested: "+serviceKeyModelSubmitted.UUID)
 	return c.JSON(http.StatusOK, &responses.AllExchangesResponse{ErrorMessage: util.StrServiceAccessTokenInvalid, Success: false})
 }
 
@@ -184,7 +184,7 @@ func ServiceRetrieveAllTradePairsAction(c echo.Context) error {
 	jsonBindError := cc.Context.Bind(serviceKeyModelSubmitted)
 
 	if jsonBindError != nil {
-		raven.CaptureError(jsonBindError, nil)
+		sentry.CaptureException(jsonBindError)
 		return c.JSON(http.StatusOK, &responses.AllTradePairsResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 	}
 
@@ -197,7 +197,7 @@ func ServiceRetrieveAllTradePairsAction(c echo.Context) error {
 	findError := cc.AppContext.Database.Find(&serviceKeyModels).Error
 
 	if findError != nil {
-		raven.CaptureError(findError, nil)
+		sentry.CaptureException(findError)
 		return c.JSON(http.StatusOK, &responses.AllTradePairsResponse{ErrorMessage: util.StrServiceKeysCouldNotBeRetrieved, Success: false})
 	}
 
@@ -212,7 +212,7 @@ func ServiceRetrieveAllTradePairsAction(c echo.Context) error {
 				findError := cc.AppContext.Database.Find(&tradePairModels).Error
 
 				if findError != nil {
-					raven.CaptureError(findError, nil)
+					sentry.CaptureException(findError)
 					return c.JSON(http.StatusOK, &responses.AllTradePairsResponse{ErrorMessage: util.StrRetrievingTradePairsError, Success: false})
 				}
 
@@ -225,6 +225,6 @@ func ServiceRetrieveAllTradePairsAction(c echo.Context) error {
 	}
 
 	// If we got here the exchange uuid is invalid
-	raven.CaptureMessage("Invalid Service UUID requested: "+serviceKeyModelSubmitted.UUID, nil)
+	sentry.CaptureMessage("Invalid Service UUID requested: "+serviceKeyModelSubmitted.UUID)
 	return c.JSON(http.StatusOK, &responses.AllTradePairsResponse{ErrorMessage: util.StrServiceAccessTokenInvalid, Success: false})
 }
