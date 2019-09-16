@@ -1,0 +1,17 @@
+version: "3.1"
+
+services:
+  database:
+    image: mysql:5.7
+    restart: always
+    container_name: "db"
+    environment:
+      MYSQL_USER: switchuser
+      MYSQL_PASSWORD: dbpassword
+      MYSQL_DATABASE: switchboarddb
+      MYSQL_ROOT_PASSWORD: dbpassword
+      command: --default-authentication-plugin=mysql_native_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - /Users/user/mnt/mysql_data:/mnt/mysql_data
