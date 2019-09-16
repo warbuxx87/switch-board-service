@@ -4,7 +4,7 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/forms"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/models"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/responses"
-	"github.com/getsentry/raven-go"
+	"github.com/getsentry/sentry-go"
 	uuid "github.com/satori/go.uuid"
 	"net/http"
 	"strconv"
@@ -34,7 +34,7 @@ func CreateExchangeAction(c echo.Context) error {
 	jsonBindError := cc.Context.Bind(addExchangeForm)
 
 	if jsonBindError != nil {
-		raven.CaptureError(jsonBindError, nil)
+		sentry.CaptureException(jsonBindError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 	}
 
@@ -45,7 +45,7 @@ func CreateExchangeAction(c echo.Context) error {
 	createError := cc.AppContext.Database.Create(&exchangeModel).Error
 
 	if createError != nil {
-		raven.CaptureError(createError, nil)
+		sentry.CaptureException(createError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrAddExchangeFailedError, Success: false})
 	}
 
@@ -75,14 +75,14 @@ func RemoveExchangeAction(c echo.Context) error {
 	findError := cc.AppContext.Database.Find(&exchangeModel, "uuid = ?", exchangeUUID).Error
 
 	if findError != nil {
-		//raven.CaptureError(findError, nil)
+		//sentry.CaptureException(findError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeNotFoundError, Success: false})
 	}
 
 	deleteError := cc.AppContext.Database.Unscoped().Delete(&exchangeModel).Error
 
 	if deleteError != nil {
-		raven.CaptureError(deleteError, nil)
+		sentry.CaptureException(deleteError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRemoveExchangeFailedError, Success: false})
 	}
 
@@ -113,7 +113,7 @@ func AuthorizeExchangeAction(c echo.Context) error {
 	findError := cc.AppContext.Database.Find(&exchangeModel, "uuid = ?", exchangeUUID).Error
 
 	if findError != nil {
-		//raven.CaptureError(findError, nil)
+		//sentry.CaptureException(findError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeNotFoundError, Success: false})
 	}
 
@@ -149,7 +149,7 @@ func RetrieveAllExchangesAction(c echo.Context) error {
 	findError := cc.AppContext.Database.Find(&exchangeModels).Error
 
 	if findError != nil {
-		raven.CaptureError(findError, nil)
+		sentry.CaptureException(findError)
 		return c.JSON(http.StatusOK, &responses.AllExchangesResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
 	}
 
@@ -184,7 +184,7 @@ func RetrieveExchangeInfoByExchangeTempTokenAction(c echo.Context) error {
 	jsonBindError := cc.Context.Bind(accessCredentialsForm)
 
 	if jsonBindError != nil {
-		raven.CaptureError(jsonBindError, nil)
+		sentry.CaptureException(jsonBindError)
 		return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 	}
 
@@ -197,7 +197,7 @@ func RetrieveExchangeInfoByExchangeTempTokenAction(c echo.Context) error {
 	findError := cc.AppContext.Database.Find(&exchangeModels).Error
 
 	if findError != nil {
-		raven.CaptureError(findError, nil)
+		sentry.CaptureException(findError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
 	}
 
@@ -219,6 +219,6 @@ func RetrieveExchangeInfoByExchangeTempTokenAction(c echo.Context) error {
 	}
 
 	// If we got here the exchange uuid is invalid
-	raven.CaptureMessage("Invalid Exchange UUID requested: "+accessCredentialsForm.UUID, nil)
+	sentry.CaptureMessage("Invalid Exchange UUID requested: "+accessCredentialsForm.UUID)
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
 }
