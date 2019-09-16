@@ -5,7 +5,7 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/models"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/responses"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
-	"github.com/getsentry/raven-go"
+	"github.com/getsentry/sentry-go"
 	"github.com/labstack/echo/v4"
 	uuid "github.com/satori/go.uuid"
 	"net/http"
@@ -29,7 +29,7 @@ func ValidateAccessAction(c echo.Context) error {
 	jsonBindError := cc.Context.Bind(exchangeModelSubmitted)
 
 	if jsonBindError != nil {
-		raven.CaptureError(jsonBindError, nil)
+		sentry.CaptureException(jsonBindError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 	}
 
@@ -43,7 +43,7 @@ func ValidateAccessAction(c echo.Context) error {
 	findError := cc.AppContext.Database.Find(&exchangeModels).Error
 
 	if findError != nil {
-		raven.CaptureError(findError, nil)
+		sentry.CaptureException(findError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
 	}
 
@@ -63,7 +63,7 @@ func ValidateAccessAction(c echo.Context) error {
 	serviceKeyFindError := cc.AppContext.Database.Find(&serviceKeyModels).Error
 
 	if serviceKeyFindError != nil {
-		raven.CaptureError(serviceKeyFindError, nil)
+		sentry.CaptureException(serviceKeyFindError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrServiceKeysCouldNotBeRetrieved, Success: false})
 	}
 
@@ -100,7 +100,7 @@ func GenerateNewTempTokenAction(c echo.Context) error {
 	jsonBindError := cc.Context.Bind(accessCredentialsForm)
 
 	if jsonBindError != nil {
-		raven.CaptureError(jsonBindError, nil)
+		sentry.CaptureException(jsonBindError)
 		return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 	}
 
@@ -113,7 +113,7 @@ func GenerateNewTempTokenAction(c echo.Context) error {
 	findError := cc.AppContext.Database.Find(&exchangeModels).Error
 
 	if findError != nil {
-		raven.CaptureError(findError, nil)
+		sentry.CaptureException(findError)
 		return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
 	}
 
@@ -128,7 +128,7 @@ func GenerateNewTempTokenAction(c echo.Context) error {
 				findError := cc.AppContext.Database.Find(&exchangeModel, "uuid = ?", accessCredentialsForm.UUID).Error
 
 				if findError != nil {
-					raven.CaptureError(findError, nil)
+					sentry.CaptureException(findError)
 					return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: util.StrExchangeNotFoundError, Success: false})
 				}
 
@@ -147,7 +147,7 @@ func GenerateNewTempTokenAction(c echo.Context) error {
 	}
 
 	// If we got here the exchange uuid is invalid
-	raven.CaptureMessage("Invalid Exchange UUID requested: "+accessCredentialsForm.UUID, nil)
+	sentry.CaptureMessage("Invalid Exchange UUID requested: "+accessCredentialsForm.UUID)
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
 }
 
@@ -170,7 +170,7 @@ func RevokeTempAccessTokenAction(c echo.Context) error {
 	jsonBindError := cc.Context.Bind(accessCredentialsForm)
 
 	if jsonBindError != nil {
-		raven.CaptureError(jsonBindError, nil)
+		sentry.CaptureException(jsonBindError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 	}
 
@@ -183,7 +183,7 @@ func RevokeTempAccessTokenAction(c echo.Context) error {
 	findError := cc.AppContext.Database.Find(&exchangeModels).Error
 
 	if findError != nil {
-		raven.CaptureError(findError, nil)
+		sentry.CaptureException(findError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
 	}
 
@@ -198,7 +198,7 @@ func RevokeTempAccessTokenAction(c echo.Context) error {
 				findError := cc.AppContext.Database.Find(&exchangeModel, "uuid = ?", accessCredentialsForm.UUID).Error
 
 				if findError != nil {
-					raven.CaptureError(findError, nil)
+					sentry.CaptureException(findError)
 					return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeNotFoundError, Success: false})
 				}
 
@@ -217,6 +217,6 @@ func RevokeTempAccessTokenAction(c echo.Context) error {
 	}
 
 	// If we got here the exchange uuid is invalid
-	raven.CaptureMessage("Invalid Exchange UUID requested: "+accessCredentialsForm.UUID, nil)
+	sentry.CaptureMessage("Invalid Exchange UUID requested: "+accessCredentialsForm.UUID)
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
 }
