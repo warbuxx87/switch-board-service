@@ -75,7 +75,7 @@ func RemoveExchangeAction(c echo.Context) error {
 	findError := cc.AppContext.Database.Find(&exchangeModel, "uuid = ?", exchangeUUID).Error
 
 	if findError != nil {
-		//sentry.CaptureException(findError)
+		sentry.CaptureException(findError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeNotFoundError, Success: false})
 	}
 
@@ -113,7 +113,7 @@ func AuthorizeExchangeAction(c echo.Context) error {
 	findError := cc.AppContext.Database.Find(&exchangeModel, "uuid = ?", exchangeUUID).Error
 
 	if findError != nil {
-		//sentry.CaptureException(findError)
+		sentry.CaptureException(findError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeNotFoundError, Success: false})
 	}
 
