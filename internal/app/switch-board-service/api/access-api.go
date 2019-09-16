@@ -147,7 +147,7 @@ func GenerateNewTempTokenAction(c echo.Context) error {
 	}
 
 	// If we got here the exchange uuid is invalid
-	sentry.CaptureMessage("Invalid Exchange UUID requested: "+accessCredentialsForm.UUID)
+	sentry.CaptureMessage(util.StrInvalidExchangeUUIDRequest+accessCredentialsForm.UUID)
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
 }
 
@@ -217,6 +217,6 @@ func RevokeTempAccessTokenAction(c echo.Context) error {
 	}
 
 	// If we got here the exchange uuid is invalid
-	sentry.CaptureMessage("Invalid Exchange UUID requested: "+accessCredentialsForm.UUID)
+	sentry.CaptureMessage(util.StrInvalidExchangeUUIDRequest+accessCredentialsForm.UUID)
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
 }

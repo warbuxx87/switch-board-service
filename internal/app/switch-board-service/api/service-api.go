@@ -161,7 +161,7 @@ func ServiceRetrieveAllExchangesAction(c echo.Context) error {
 	}
 
 	// If we got here the exchange uuid is invalid
-	sentry.CaptureMessage("Invalid Service UUID requested: "+serviceKeyModelSubmitted.UUID)
+	sentry.CaptureMessage(util.StrInvalidExchangeUUIDRequest+serviceKeyModelSubmitted.UUID)
 	return c.JSON(http.StatusOK, &responses.AllExchangesResponse{ErrorMessage: util.StrServiceAccessTokenInvalid, Success: false})
 }
 
@@ -225,6 +225,6 @@ func ServiceRetrieveAllTradePairsAction(c echo.Context) error {
 	}
 
 	// If we got here the exchange uuid is invalid
-	sentry.CaptureMessage("Invalid Service UUID requested: "+serviceKeyModelSubmitted.UUID)
+	sentry.CaptureMessage(util.StrInvalidExchangeUUIDRequest+serviceKeyModelSubmitted.UUID)
 	return c.JSON(http.StatusOK, &responses.AllTradePairsResponse{ErrorMessage: util.StrServiceAccessTokenInvalid, Success: false})
 }

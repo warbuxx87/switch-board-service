@@ -208,7 +208,7 @@ func CreateExchangeTradePairsAssociationAction(c echo.Context) error {
 
 	// If we got here the exchange uuid is invalid
 
-	sentry.CaptureMessage("Invalid Exchange UUID requested: "+tradePairAssociationForm.ExchangeUUID)
+	sentry.CaptureMessage(util.StrInvalidExchangeUUIDRequest+tradePairAssociationForm.ExchangeUUID)
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
 }
 
@@ -275,6 +275,6 @@ func RemoveExchangeTradePairsAssociationAction(c echo.Context) error {
 
 	// If we got here the exchange uuid is invalid
 
-	sentry.CaptureMessage("Invalid Exchange UUID requested: "+tradePairAssociationForm.ExchangeUUID)
+	sentry.CaptureMessage(util.StrInvalidExchangeUUIDRequest+tradePairAssociationForm.ExchangeUUID)
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
 }
