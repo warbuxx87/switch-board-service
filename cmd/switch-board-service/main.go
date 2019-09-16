@@ -79,8 +79,8 @@ func main() {
 	}
 	databaseConnection, databaseError := connectToDatabase(config)
 	if databaseError != nil {
-		logrus.Error(databaseError, nil)
-		return
+		logrus.Errorf("failed to connect to database; %v", databaseError, nil)
+		os.Exit(1)
 	} else {
 		logrus.Info("Successfully connected to database")
 	}

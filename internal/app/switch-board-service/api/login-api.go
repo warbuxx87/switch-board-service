@@ -9,6 +9,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/getsentry/raven-go"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 	"net/http"
 	"time"
 )
@@ -57,12 +58,13 @@ func LoginAction(c echo.Context) error {
 		// Generate encoded token and send it as response.
 		createdToken, createdTokenError := token.SignedString([]byte(cc.AppContext.Config.JWTSecret))
 		if createdTokenError != nil {
+			raven.CaptureError(errors.Wrap(createdTokenError, "failed to create JWT token"), nil)
 			return createdTokenError
 		}
-
 		return c.JSON(http.StatusOK, &responses.LoginResponse{ErrorMessage: "", Success: true, AuthToken: "Bearer " + createdToken})
-
+	}else {
+		raven.CaptureMessage(fmt.Sprintf("Invalid authentication credentials; username=%s&password=%s&ip=%s",
+			loginForm.Username, loginForm.Password, c.RealIP()), nil)
 	}
-
 	return cc.Context.Redirect(http.StatusFound, "/login")
 }
