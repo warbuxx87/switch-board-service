@@ -162,7 +162,6 @@ func RetrieveAllExchangesAction(c echo.Context) error {
 		element.AuthorizedTradePairs = tradePairs
 		sanitizedExchangeModels = append(sanitizedExchangeModels, element)
 	}
-
 	return c.JSON(http.StatusOK, &responses.AllExchangesResponse{Exchanges: sanitizedExchangeModels, ErrorMessage: "", Success: true})
 }
 
@@ -220,7 +219,6 @@ func RetrieveExchangeInfoByExchangeTempTokenAction(c echo.Context) error {
 	}
 
 	// If we got here the exchange uuid is invalid
-
 	raven.CaptureMessage("Invalid Exchange UUID requested: "+accessCredentialsForm.UUID, nil)
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
 }

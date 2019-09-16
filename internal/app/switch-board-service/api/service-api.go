@@ -77,7 +77,7 @@ func RemoveServiceKeyAction(c echo.Context) error {
 	findError := cc.AppContext.Database.Find(&serviceKeyModel, "uuid = ?", serviceKeyUUID).Error
 
 	if findError != nil {
-		//raven.CaptureError(findError, nil)
+		raven.CaptureError(findError, nil)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeNotFoundError, Success: false})
 	}
 

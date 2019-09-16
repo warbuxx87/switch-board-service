@@ -1,10 +1,12 @@
 package util
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
-	"github.com/tkanos/gonfig"
+	log "github.com/sirupsen/logrus"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 )
 
 type Configuration struct {
@@ -26,16 +28,28 @@ type ActionResult struct {
 }
 
 func LoadConfigurationFile() (*Configuration, error) {
-
-	configuration := Configuration{}
-	err := gonfig.GetConf("config.json", &configuration)
-
+	configPath, err := resolveConfigPath()
 	if err != nil {
-		logrus.WithFields(logrus.Fields{}).Error(err)
-		return nil, errors.New("Failed to load configuration file")
+		return nil, err
 	}
-
+	log.Printf("Loading configuration from %s", configPath)
+	configuration := Configuration{}
+	data, err := ioutil.ReadFile(configPath)
+	if err != nil {
+		return nil, err
+	}
+	if err := json.Unmarshal(data, &configuration); err != nil {
+		return nil, err
+	}
 	return &configuration, nil
+}
+
+func resolveConfigPath() (string, error) {
+	wd, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(wd, "configs", "config.json"), nil
 }
 
 func ShowBanner() {

@@ -71,18 +71,14 @@ func ValidateAccessAction(c echo.Context) error {
 
 		if element.UUID == exchangeModelSubmitted.UUID {
 			if element.AccessToken == exchangeModelSubmitted.AccessToken {
-
 				return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: "", Success: true})
-
 			} else {
 				// Invalid access token
 				return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrServiceAccessTokenInvalid, Success: false})
 			}
 		}
 	}
-
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
-
 }
 
 // Generate New Temp Token godoc

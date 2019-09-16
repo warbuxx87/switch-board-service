@@ -2,8 +2,8 @@ package util
 
 import (
 	"errors"
-	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo-contrib/session"
+	"github.com/labstack/echo/v4"
 	"html/template"
 	"io"
 )

@@ -40,9 +40,7 @@ func connectToDatabase(config *util.Configuration) (*gorm.DB, error) {
 }
 
 func init() {
-
 	logrus.SetOutput(os.Stdout)
-
 	logrus.SetLevel(logrus.InfoLevel)
 }
 
@@ -67,114 +65,108 @@ func init() {
 func main() {
 
 	util.ShowBanner()
-
 	config, configLoadError := util.LoadConfigurationFile()
+	if configLoadError != nil {
+		logrus.Fatalf("failed to load app configuration; %v", configLoadError)
+		os.Exit(1)
+	}
+	if config.LogLevel == 0 {
+		logrus.SetLevel(logrus.InfoLevel)
+		logrus.Info("Log Level: Info")
+	} else {
+		logrus.SetLevel(logrus.DebugLevel)
+		logrus.Info("Log Level: Debug")
+	}
+	databaseConnection, databaseError := connectToDatabase(config)
+	if databaseError != nil {
+		logrus.Errorf("failed to connect to database; %v", databaseError, nil)
+		os.Exit(1)
+	} else {
+		logrus.Info("Successfully connected to database")
+	}
 
-	if configLoadError == nil {
+	// Create the data context
+	dataContext := util.DataContext{}
 
-		// Set the logrus config level
-		if config.LogLevel == 0 {
-			logrus.SetLevel(logrus.InfoLevel)
-			logrus.Info("Log Level: Info")
-		} else {
-			logrus.SetLevel(logrus.DebugLevel)
-			logrus.Info("Log Level: Debug")
+	dataContext.Config = config
+	dataContext.Database = databaseConnection
 
+	sentrySetDSNError := raven.SetDSN(config.SentryUrl)
+
+	if sentrySetDSNError != nil {
+		logrus.WithFields(logrus.Fields{}).Error(sentrySetDSNError)
+	}
+
+	e := echo.New()
+	e.Debug = true
+
+	// Register our custom app context
+	e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
+
+		return func(c echo.Context) error {
+			cc := &util.EndpointContext{Context: c, AppContext: &dataContext}
+			return h(cc)
 		}
+	})
 
-		databaseConnection, databaseError := connectToDatabase(config)
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte(uuid.NewV4().String()))))
 
-		if databaseError != nil {
-			logrus.Error(databaseError, nil)
-			return
-		} else {
-			logrus.Info("Successfully connected to database")
-		}
+	e.Use(middleware.Logger())
 
-		// Create the data context
-		dataContext := util.DataContext{}
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     []string{"*"},
+		AllowHeaders:     []string{"authorization", "Content-Type"},
+		AllowCredentials: true,
+		AllowMethods:     []string{echo.OPTIONS, echo.GET, echo.POST},
+	}))
 
-		dataContext.Config = config
-		dataContext.Database = databaseConnection
+	templates := make(map[string]*template.Template)
 
-		sentrySetDSNError := raven.SetDSN(config.SentryUrl)
+	e.Renderer = &util.TemplateRegistry{
+		Templates: templates,
+	}
 
-		if sentrySetDSNError != nil {
-			logrus.WithFields(logrus.Fields{}).Error(sentrySetDSNError)
-		}
+	gob.Register(models.UserModel{})
 
-		e := echo.New()
-		e.Debug = true
+	e.HideBanner = true
 
-		// Register our custom app context
-		e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
+	// Public
+	e.POST("/v1/login", api.LoginAction)
+	e.POST("/v1/generate_new_temp_token", api.GenerateNewTempTokenAction)
+	e.POST("/v1/revoke_temp_access_token", api.RevokeTempAccessTokenAction)
+	e.POST("/v1/retrieve_exchange_by_temp_token", api.RetrieveExchangeInfoByExchangeTempTokenAction)
 
-			return func(c echo.Context) error {
-				cc := &util.EndpointContext{Context: c, AppContext: &dataContext}
-				return h(cc)
-			}
-		})
+	// Services
+	e.POST("/v1/validate_access", api.ValidateAccessAction)
+	e.POST("/v1/service/service_retrieve_all_exchanges", api.ServiceRetrieveAllExchangesAction)
+	e.POST("/v1/service/service_retrieve_all_trade_pairs", api.ServiceRetrieveAllTradePairsAction)
 
-		e.Use(session.Middleware(sessions.NewCookieStore([]byte(uuid.NewV4().String()))))
+	r := e.Group("/v1/action")
 
-		e.Use(middleware.Logger())
+	r.Use(middleware.JWT([]byte(config.JWTSecret)))
 
-		e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-			AllowOrigins:     []string{"*"},
-			AllowHeaders:     []string{"authorization", "Content-Type"},
-			AllowCredentials: true,
-			AllowMethods:     []string{echo.OPTIONS, echo.GET, echo.POST},
-		}))
+	// Exchanges
+	r.POST("/create_exchange", api.CreateExchangeAction)
+	r.GET("/remove_exchange", api.RemoveExchangeAction)
+	r.GET("/authorize_exchange", api.AuthorizeExchangeAction)
+	r.GET("/retrieve_all_exchanges", api.RetrieveAllExchangesAction)
 
-		templates := make(map[string]*template.Template)
+	// Trade pair
+	r.POST("/create_trade_pair", api.CreateTradePairAction)
+	r.GET("/remove_trade_pair", api.RemoveTradePairAction)
+	r.GET("/retrieve_all_trade_pairs", api.RetrieveAllTradePairsAction)
+	r.POST("/create_exchange_trade_pair_association", api.CreateExchangeTradePairsAssociationAction)
+	r.POST("/remove_exchange_trade_pair_association", api.RemoveExchangeTradePairsAssociationAction)
 
-		e.Renderer = &util.TemplateRegistry{
-			Templates: templates,
-		}
+	// Service Keys
+	r.POST("/create_service_key", api.CreateServiceKeyAction)
+	r.GET("/remove_service_key", api.RemoveServiceKeyAction)
 
-		gob.Register(models.UserModel{})
+	e.Logger.Fatal(e.Start(config.ListenIp + ":" + strconv.Itoa(config.ListenPort)))
 
-		e.HideBanner = true
+	databaseCloseError := dataContext.Database.Close()
 
-		// Public
-		e.POST("/v1/login", api.LoginAction)
-		e.POST("/v1/generate_new_temp_token", api.GenerateNewTempTokenAction)
-		e.POST("/v1/revoke_temp_access_token", api.RevokeTempAccessTokenAction)
-		e.POST("/v1/retrieve_exchange_by_temp_token", api.RetrieveExchangeInfoByExchangeTempTokenAction)
-
-		// Services
-		e.POST("/v1/validate_access", api.ValidateAccessAction)
-		e.POST("/v1/service/service_retrieve_all_exchanges", api.ServiceRetrieveAllExchangesAction)
-		e.POST("/v1/service/service_retrieve_all_trade_pairs", api.ServiceRetrieveAllTradePairsAction)
-
-		r := e.Group("/v1/action")
-
-		r.Use(middleware.JWT([]byte(config.JWTSecret)))
-
-		// Exchanges
-		r.POST("/create_exchange", api.CreateExchangeAction)
-		r.GET("/remove_exchange", api.RemoveExchangeAction)
-		r.GET("/authorize_exchange", api.AuthorizeExchangeAction)
-		r.GET("/retrieve_all_exchanges", api.RetrieveAllExchangesAction)
-
-		// Trade pair
-		r.POST("/create_trade_pair", api.CreateTradePairAction)
-		r.GET("/remove_trade_pair", api.RemoveTradePairAction)
-		r.GET("/retrieve_all_trade_pairs", api.RetrieveAllTradePairsAction)
-		r.POST("/create_exchange_trade_pair_association", api.CreateExchangeTradePairsAssociationAction)
-		r.POST("/remove_exchange_trade_pair_association", api.RemoveExchangeTradePairsAssociationAction)
-
-		// Service Keys
-		r.POST("/create_service_key", api.CreateServiceKeyAction)
-		r.GET("/remove_service_key", api.RemoveServiceKeyAction)
-
-		e.Logger.Fatal(e.Start(config.ListenIp + ":" + strconv.Itoa(config.ListenPort)))
-
-		databaseCloseError := dataContext.Database.Close()
-
-		if databaseCloseError != nil {
-			raven.CaptureError(databaseCloseError, nil)
-		}
-
+	if databaseCloseError != nil {
+		raven.CaptureError(databaseCloseError, nil)
 	}
 }
