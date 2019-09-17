@@ -91,6 +91,40 @@ func RemoveServiceKeyAction(c echo.Context) error {
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: "", Success: true})
 }
 
+
+// Retrieve All Service Key Entries godoc
+// @Summary Retrieve all service key entries .
+// @Description Retrieves all service key entries.
+// @Accept  json
+// @Produce  json
+// @Tags Service
+// @Param Authorization header string true "Authentication header"
+// @Success 200 {object} responses.AllServiceKeysResponse ""
+// @Failure 200 {object} responses.AllServiceKeysResponse ""
+// @Router /v1/action/retrieve_all_service_keys [get]
+func RetrieveAllServiceKeysAction(c echo.Context) error {
+
+	cc := c.(*util.EndpointContext)
+
+	var serviceKeyModels []models.ServiceKeyModel
+
+	findError := cc.AppContext.Database.Find(&serviceKeyModels).Error
+
+	if findError != nil {
+		sentry.CaptureException(findError)
+		return c.JSON(http.StatusOK, &responses.AllExchangesResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
+	}
+
+	var sanitizedServerKeyModels []models.ServiceKeyModel
+
+	for _, element := range serviceKeyModels {
+		element.AccessToken = ""
+		sanitizedServerKeyModels = append(sanitizedServerKeyModels, element)
+	}
+
+	return c.JSON(http.StatusOK, &responses.AllServiceKeysResponse{ServiceKeys: sanitizedServerKeyModels, ErrorMessage: "", Success: true})
+}
+
 // Retrieve All Exchange Entries godoc
 // @Summary Retrieve all exchanges .
 // @Description Retrieves all exchanges and exchange information

@@ -92,7 +92,7 @@ func main() {
 	dataContext.Database = databaseConnection
 
 	sentrySetDSNError := sentry.Init(sentry.ClientOptions{
-        	Dsn: config.SentryUrl,
+		Dsn: config.SentryUrl,
 	})
 
 	if sentrySetDSNError != nil {
@@ -163,6 +163,7 @@ func main() {
 	// Service Keys
 	r.POST("/create_service_key", api.CreateServiceKeyAction)
 	r.GET("/remove_service_key", api.RemoveServiceKeyAction)
+	r.GET("/retrieve_all_service_keys", api.RetrieveAllServiceKeysAction)
 
 	e.Logger.Fatal(e.Start(config.ListenIp + ":" + strconv.Itoa(config.ListenPort)))
 
