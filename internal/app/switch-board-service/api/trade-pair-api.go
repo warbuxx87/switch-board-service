@@ -4,7 +4,7 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/forms"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/models"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/responses"
-	"github.com/getsentry/raven-go"
+	"github.com/getsentry/sentry-go"
 	uuid "github.com/satori/go.uuid"
 	"net/http"
 
@@ -32,7 +32,7 @@ func CreateTradePairAction(c echo.Context) error {
 	jsonBindError := cc.Context.Bind(tradePairForm)
 
 	if jsonBindError != nil {
-		raven.CaptureError(jsonBindError, nil)
+		sentry.CaptureException(jsonBindError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 
 	}
@@ -47,7 +47,7 @@ func CreateTradePairAction(c echo.Context) error {
 	createError := cc.AppContext.Database.Create(&tradePairModel).Error
 
 	if createError != nil {
-		raven.CaptureError(createError, nil)
+		sentry.CaptureException(createError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrAddTradePairError, Success: false})
 	}
 
@@ -77,7 +77,7 @@ func RemoveTradePairAction(c echo.Context) error {
 	findError := cc.AppContext.Database.Find(&tradePairModel, "uuid = ?", tradePairUUID).Error
 
 	if findError != nil {
-		raven.CaptureError(findError, nil)
+		sentry.CaptureException(findError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrTradePairNotFoundError, Success: false})
 	}
 
@@ -86,7 +86,7 @@ func RemoveTradePairAction(c echo.Context) error {
 	findAllError := cc.AppContext.Database.Find(&exchangeModels).Error
 
 	if findAllError != nil {
-		raven.CaptureError(findAllError, nil)
+		sentry.CaptureException(findAllError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangesCouldNotBeRetrieved, Success: false})
 	}
 
@@ -107,7 +107,7 @@ func RemoveTradePairAction(c echo.Context) error {
 	deleteError := cc.AppContext.Database.Unscoped().Delete(&tradePairModel).Error
 
 	if deleteError != nil {
-		raven.CaptureError(deleteError, nil)
+		sentry.CaptureException(deleteError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRemoveTradePairFailedError, Success: false})
 	}
 
@@ -133,7 +133,7 @@ func RetrieveAllTradePairsAction(c echo.Context) error {
 	findError := cc.AppContext.Database.Find(&tradePairModels).Error
 
 	if findError != nil {
-		raven.CaptureError(findError, nil)
+		sentry.CaptureException(findError)
 		return c.JSON(http.StatusOK, &responses.AllTradePairsResponse{ErrorMessage: util.StrRetrievingTradePairsError, Success: false})
 	}
 
@@ -160,7 +160,7 @@ func CreateExchangeTradePairsAssociationAction(c echo.Context) error {
 	jsonBindError := cc.Context.Bind(tradePairAssociationForm)
 
 	if jsonBindError != nil {
-		raven.CaptureError(jsonBindError, nil)
+		sentry.CaptureException(jsonBindError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 
 	}
@@ -170,7 +170,7 @@ func CreateExchangeTradePairsAssociationAction(c echo.Context) error {
 	findError := cc.AppContext.Database.Find(&exchangeModels).Error
 
 	if findError != nil {
-		raven.CaptureError(findError, nil)
+		sentry.CaptureException(findError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
 	}
 
@@ -193,7 +193,7 @@ func CreateExchangeTradePairsAssociationAction(c echo.Context) error {
 			findError := cc.AppContext.Database.Find(&tradePairModel, "uuid = ?", tradePairAssociationForm.TradePairUUID).Error
 
 			if findError != nil {
-				raven.CaptureError(findError, nil)
+				sentry.CaptureException(findError)
 				return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrTradePairNotFoundError, Success: false})
 			}
 
@@ -208,7 +208,7 @@ func CreateExchangeTradePairsAssociationAction(c echo.Context) error {
 
 	// If we got here the exchange uuid is invalid
 
-	raven.CaptureMessage("Invalid Exchange UUID requested: "+tradePairAssociationForm.ExchangeUUID, nil)
+	sentry.CaptureMessage(util.StrInvalidExchangeUUIDRequest+tradePairAssociationForm.ExchangeUUID)
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
 }
 
@@ -231,7 +231,7 @@ func RemoveExchangeTradePairsAssociationAction(c echo.Context) error {
 	jsonBindError := cc.Context.Bind(tradePairAssociationForm)
 
 	if jsonBindError != nil {
-		raven.CaptureError(jsonBindError, nil)
+		sentry.CaptureException(jsonBindError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 
 	}
@@ -241,7 +241,7 @@ func RemoveExchangeTradePairsAssociationAction(c echo.Context) error {
 	findError := cc.AppContext.Database.Find(&exchangeModels).Error
 
 	if findError != nil {
-		raven.CaptureError(findError, nil)
+		sentry.CaptureException(findError)
 		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrRetrievingExchangesError, Success: false})
 	}
 
@@ -275,6 +275,6 @@ func RemoveExchangeTradePairsAssociationAction(c echo.Context) error {
 
 	// If we got here the exchange uuid is invalid
 
-	raven.CaptureMessage("Invalid Exchange UUID requested: "+tradePairAssociationForm.ExchangeUUID, nil)
+	sentry.CaptureMessage(util.StrInvalidExchangeUUIDRequest+tradePairAssociationForm.ExchangeUUID)
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
 }

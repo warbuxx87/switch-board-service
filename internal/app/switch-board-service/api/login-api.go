@@ -7,7 +7,7 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/getsentry/raven-go"
+	"github.com/getsentry/sentry-go"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 	"net/http"
@@ -33,14 +33,14 @@ func LoginAction(c echo.Context) error {
 	jsonBindError := cc.Context.Bind(loginForm)
 
 	if jsonBindError != nil {
-		raven.CaptureError(jsonBindError, nil)
+		sentry.CaptureException(jsonBindError)
 		return c.JSON(http.StatusOK, &responses.LoginResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
 	}
 
 	userModel, userModelError := util.RetrieveUserModelByUsername(cc.AppContext.Database, loginForm.Username)
 
 	if userModelError != nil {
-		raven.CaptureError(userModelError, nil)
+		sentry.CaptureException(userModelError)
 		return c.JSON(http.StatusOK, &responses.LoginResponse{ErrorMessage: util.StrUserNotFoundError, Success: false})
 	}
 
@@ -58,13 +58,13 @@ func LoginAction(c echo.Context) error {
 		// Generate encoded token and send it as response.
 		createdToken, createdTokenError := token.SignedString([]byte(cc.AppContext.Config.JWTSecret))
 		if createdTokenError != nil {
-			raven.CaptureError(errors.Wrap(createdTokenError, "failed to create JWT token"), nil)
+			sentry.CaptureException(errors.Wrap(createdTokenError, "failed to create JWT token"))
 			return createdTokenError
 		}
 		return c.JSON(http.StatusOK, &responses.LoginResponse{ErrorMessage: "", Success: true, AuthToken: "Bearer " + createdToken})
 	}else {
-		raven.CaptureMessage(fmt.Sprintf("Invalid authentication credentials; username=%s&password=%s&ip=%s",
-			loginForm.Username, loginForm.Password, c.RealIP()), nil)
+		sentry.CaptureMessage(fmt.Sprintf("Invalid authentication credentials; username=%s&password=%s&ip=%s",
+			loginForm.Username, loginForm.Password, c.RealIP()))
 	}
 	return cc.Context.Redirect(http.StatusFound, "/login")
 }
