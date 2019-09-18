@@ -64,10 +64,16 @@ func init() {
 // @BasePath /
 
 func main() {
-	configFilename := flag.String("cfgFileName", "dev.json", "Defaults to Development Json Configuration file: 'dev.json'.  Use flag -cfgFileName=config.json for production")
+	prod := flag.Bool("prod", false, "Use '$go run ./cmd/... -prod' to set to true, changing default configuration file from 'dev.json' to 'config.json'")
 	flag.Parse()
+	var configFilename string
+	if *prod {
+		configFilename = "config.json"
+	}else {
+		configFilename = "dev.json"
+	}
 	util.ShowBanner()
-	config, configLoadError := util.LoadConfigurationFile(*configFilename)
+	config, configLoadError := util.LoadConfigurationFile(configFilename)
 	if configLoadError != nil {
 		logrus.Fatalf("failed to load app configuration; %v", configLoadError)
 		os.Exit(1)
