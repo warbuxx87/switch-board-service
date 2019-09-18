@@ -26,3 +26,5 @@ var StrAddServiceKeyFailedError = "Error while trying to create service key."
 var StrRemoveServiceKeyFailedError = "Error while trying to remove service key."
 var StrServiceKeysCouldNotBeRetrieved = "Error occurred while attempting to retrieve service keys."
 var StrServiceAccessTokenInvalid = "Error exchange id or access token is invalid. "
+
+var StrInvalidExchangeUUIDRequest = "Invalid Exchange UUID requested: "

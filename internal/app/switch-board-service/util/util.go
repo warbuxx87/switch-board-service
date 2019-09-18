@@ -27,8 +27,8 @@ type Configuration struct {
 type ActionResult struct {
 }
 
-func LoadConfigurationFile() (*Configuration, error) {
-	configPath, err := resolveConfigPath()
+func LoadConfigurationFile(filename string) (*Configuration, error) {
+	configPath, err := resolveConfigPath(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -44,12 +44,12 @@ func LoadConfigurationFile() (*Configuration, error) {
 	return &configuration, nil
 }
 
-func resolveConfigPath() (string, error) {
+func resolveConfigPath(filename string) (string, error) {
 	wd, err := os.Getwd()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(wd, "configs", "config.json"), nil
+	return filepath.Join(wd, "configs", filename), nil
 }
 
 func ShowBanner() {

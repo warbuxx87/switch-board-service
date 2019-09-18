@@ -57,6 +57,15 @@ definitions:
       uuid:
         type: string
     type: object
+  models.ServiceKeyModel:
+    properties:
+      access_token:
+        type: string
+      name:
+        type: string
+      uuid:
+        type: string
+    type: object
   models.TradePairModel:
     properties:
       base_asset:
@@ -75,6 +84,17 @@ definitions:
       exchanges:
         items:
           $ref: '#/definitions/models.ExchangeModel'
+        type: array
+      success:
+        type: boolean
+    type: object
+  responses.AllServiceKeysResponse:
+    properties:
+      error_message:
+        type: string
+      service_keys:
+        items:
+          $ref: '#/definitions/models.ServiceKeyModel'
         type: array
       success:
         type: boolean
@@ -167,7 +187,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Authorizes an exchange
       tags:
       - Exchange
@@ -196,7 +215,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Create a new exchange entry.
       tags:
       - Exchange
@@ -225,7 +243,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Associates a exchange and trade pair
       tags:
       - TradePair
@@ -254,7 +271,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.ServiceKeyResponse'
-            type: object
       summary: Create a service key entry .
       tags:
       - Service
@@ -283,7 +299,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Create a trade pair entry.
       tags:
       - TradePair
@@ -310,7 +325,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Removes a existing exchange entry.
       tags:
       - Exchange
@@ -339,7 +353,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Removes a exchange and trade pair association
       tags:
       - TradePair
@@ -366,7 +379,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Removes a service key entry
       tags:
       - Service
@@ -393,7 +405,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Removes a trade pair entry.
       tags:
       - TradePair
@@ -415,10 +426,30 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.AllExchangesResponse'
-            type: object
       summary: Retrieve all exchanges .
       tags:
       - Exchange
+  /v1/action/retrieve_all_service_keys:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all service key entries.
+      parameters:
+      - description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.AllServiceKeysResponse'
+      summary: Retrieve all service key entries .
+      tags:
+      - Service
   /v1/action/retrieve_all_trade_pairs:
     get:
       consumes:
@@ -437,7 +468,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.AllTradePairsResponse'
-            type: object
       summary: Retrieve all trade pairs .
       tags:
       - TradePair
@@ -461,7 +491,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.ExchangeInfoResponse'
-            type: object
       summary: Retrieve exchange info by temp token .
       tags:
       - Exchange
@@ -485,7 +514,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.ExchangeInfoResponse'
-            type: object
       summary: Generate a new temp token for a exchange
       tags:
       - Public
@@ -510,7 +538,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.LoginResponse'
-            type: object
       summary: Login and receive JWT token.
       tags:
       - Public
@@ -534,7 +561,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Revokes an exchanges temp access token
       tags:
       - Public
@@ -558,7 +584,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.AllExchangesResponse'
-            type: object
       summary: Retrieve all exchanges .
       tags:
       - Service-Endpoints
@@ -582,7 +607,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.AllExchangesResponse'
-            type: object
       summary: Retrieve all trade pair entries .
       tags:
       - Service-Endpoints
@@ -606,7 +630,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Validates exchanges and service credentials
       tags:
       - Public

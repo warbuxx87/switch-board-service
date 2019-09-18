@@ -6,7 +6,7 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/getsentry/raven-go"
+	"github.com/getsentry/sentry-go"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
@@ -33,20 +33,20 @@ func LoginAction(c echo.Context) error {
 	jsonBindError := cc.Context.Bind(loginForm)
 
 	if jsonBindError != nil {
-		raven.CaptureError(jsonBindError, nil)
+		sentry.CaptureException(jsonBindError)
 		return c.JSON(http.StatusOK, &responses.LoginResponse{ErrorMessage: util.StrNotCurrentlyLoggedIn, Success: false})
 	}
 
 	userModel, userModelError := util.RetrieveUserModelByUsername(cc.AppContext.Database, loginForm.Username)
 
 	if userModelError != nil {
-		raven.CaptureError(userModelError, nil)
+		sentry.CaptureException(userModelError)
 		return c.JSON(http.StatusOK, &responses.LoginResponse{ErrorMessage: util.StrUserNotFoundError, Success: false})
 	}
 	if err := verifyPassword(loginForm.Password, userModel.PasswordHash); err != nil {
-		raven.CaptureError(err, nil)
-		raven.CaptureMessage(fmt.Sprintf("Invalid authentication credentials; username=%s&password=%s&ip=%s",
-			loginForm.Username, loginForm.Password, c.RealIP()), nil)
+		sentry.CaptureException(err)
+		sentry.CaptureMessage(fmt.Sprintf("Invalid authentication credentials; username=%s&password=%s&ip=%s",
+			loginForm.Username, loginForm.Password, c.RealIP()))
 		return c.JSON(http.StatusOK, &responses.LoginResponse{
 			Success:      false,
 			ErrorMessage: util.StrInvalidLoginCredential,
@@ -63,7 +63,7 @@ func LoginAction(c echo.Context) error {
 	// Generate encoded token and send it as response.
 	createdToken, createdTokenError := token.SignedString([]byte(cc.AppContext.Config.JWTSecret))
 	if createdTokenError != nil {
-		raven.CaptureError(errors.Wrap(createdTokenError, "failed to create JWT token"), nil)
+		sentry.CaptureException(errors.Wrap(createdTokenError, "failed to create JWT token"))
 		return createdTokenError
 	}
 	return c.JSON(http.StatusOK, &responses.LoginResponse{ErrorMessage: "", Success: true, AuthToken: "Bearer " + createdToken})

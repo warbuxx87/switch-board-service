@@ -5,7 +5,7 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/models"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
 	"encoding/gob"
-	"github.com/getsentry/raven-go"
+	"github.com/getsentry/sentry-go"
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -17,6 +17,7 @@ import (
 	"html/template"
 	"os"
 	"strconv"
+	"flag"
 )
 
 func connectToDatabase(config *util.Configuration) (*gorm.DB, error) {
@@ -63,9 +64,16 @@ func init() {
 // @BasePath /
 
 func main() {
-
+	prod := flag.Bool("prod", false, "Use '$go run ./cmd/... -prod' to set to true, changing default configuration file from 'dev.json' to 'config.json'")
+	flag.Parse()
+	var configFilename string
+	if *prod {
+		configFilename = "config.json"
+	}else {
+		configFilename = "dev.json"
+	}
 	util.ShowBanner()
-	config, configLoadError := util.LoadConfigurationFile()
+	config, configLoadError := util.LoadConfigurationFile(configFilename)
 	if configLoadError != nil {
 		logrus.Fatalf("failed to load app configuration; %v", configLoadError)
 		os.Exit(1)
@@ -91,7 +99,9 @@ func main() {
 	dataContext.Config = config
 	dataContext.Database = databaseConnection
 
-	sentrySetDSNError := raven.SetDSN(config.SentryUrl)
+	sentrySetDSNError := sentry.Init(sentry.ClientOptions{
+		Dsn: config.SentryUrl,
+	})
 
 	if sentrySetDSNError != nil {
 		logrus.WithFields(logrus.Fields{}).Error(sentrySetDSNError)
@@ -161,12 +171,13 @@ func main() {
 	// Service Keys
 	r.POST("/create_service_key", api.CreateServiceKeyAction)
 	r.GET("/remove_service_key", api.RemoveServiceKeyAction)
+	r.GET("/retrieve_all_service_keys", api.RetrieveAllServiceKeysAction)
 
 	e.Logger.Fatal(e.Start(config.ListenIp + ":" + strconv.Itoa(config.ListenPort)))
 
 	databaseCloseError := dataContext.Database.Close()
 
 	if databaseCloseError != nil {
-		raven.CaptureError(databaseCloseError, nil)
+		sentry.CaptureException(databaseCloseError)
 	}
 }

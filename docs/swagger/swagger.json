@@ -56,7 +56,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -99,7 +98,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -142,7 +140,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -185,7 +182,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.ServiceKeyResponse"
                         }
                     }
@@ -228,7 +224,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -268,7 +263,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -311,7 +305,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -351,7 +344,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -391,7 +383,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -424,8 +415,39 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.AllExchangesResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/action/retrieve_all_service_keys": {
+            "get": {
+                "description": "Retrieves all service key entries.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service"
+                ],
+                "summary": "Retrieve all service key entries .",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/responses.AllServiceKeysResponse"
                         }
                     }
                 }
@@ -457,7 +479,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.AllTradePairsResponse"
                         }
                     }
@@ -493,7 +514,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.ExchangeInfoResponse"
                         }
                     }
@@ -529,7 +549,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.ExchangeInfoResponse"
                         }
                     }
@@ -565,7 +584,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.LoginResponse"
                         }
                     }
@@ -601,7 +619,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -637,7 +654,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.AllExchangesResponse"
                         }
                     }
@@ -673,7 +689,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.AllExchangesResponse"
                         }
                     }
@@ -709,7 +724,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -807,6 +821,20 @@
                 }
             }
         },
+        "models.ServiceKeyModel": {
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            }
+        },
         "models.TradePairModel": {
             "type": "object",
             "properties": {
@@ -834,6 +862,23 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/models.ExchangeModel"
+                    }
+                },
+                "success": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "responses.AllServiceKeysResponse": {
+            "type": "object",
+            "properties": {
+                "error_message": {
+                    "type": "string"
+                },
+                "service_keys": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ServiceKeyModel"
                     }
                 },
                 "success": {
