@@ -136,7 +136,7 @@ func GenerateNewTempTokenAction(c echo.Context) error {
 
 				cc.AppContext.Database.Save(&exchangeModel)
 
-				return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: "", Success: true, Exchange: stripAccessToken(&exchangeModel)})
+				return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: "", Success: true, Exchange: *stripAccessToken(exchangeModel)})
 			} else {
 				// Invalid access token
 				return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
@@ -205,7 +205,7 @@ func RevokeTempAccessTokenAction(c echo.Context) error {
 
 				cc.AppContext.Database.Save(&exchangeModel)
 
-				return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: "", Success: true, Exchange: stripAccessToken(&exchangeModel)})
+				return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: "", Success: true, Exchange: *stripAccessToken(exchangeModel)})
 			} else {
 				// Invalid access token
 				return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
@@ -220,5 +220,5 @@ func RevokeTempAccessTokenAction(c echo.Context) error {
 
 func stripAccessToken(exchangeModel *models.ExchangeModel) *models.ExchangeModel {
 	exchangeModel.AccessToken = ""
-	return *exchangeModel
+	return exchangeModel
 }
