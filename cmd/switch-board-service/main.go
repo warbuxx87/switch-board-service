@@ -17,6 +17,7 @@ import (
 	"html/template"
 	"os"
 	"strconv"
+	"flag"
 )
 
 func connectToDatabase(config *util.Configuration) (*gorm.DB, error) {
@@ -63,9 +64,16 @@ func init() {
 // @BasePath /
 
 func main() {
-
+	prod := flag.Bool("prod", false, "Use '$go run ./cmd/... -prod' to set to true, changing default configuration file from 'dev.json' to 'config.json'")
+	flag.Parse()
+	var configFilename string
+	if *prod {
+		configFilename = "config.json"
+	}else {
+		configFilename = "dev.json"
+	}
 	util.ShowBanner()
-	config, configLoadError := util.LoadConfigurationFile()
+	config, configLoadError := util.LoadConfigurationFile(configFilename)
 	if configLoadError != nil {
 		logrus.Fatalf("failed to load app configuration; %v", configLoadError)
 		os.Exit(1)
