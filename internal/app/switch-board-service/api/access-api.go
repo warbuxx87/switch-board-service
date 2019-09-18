@@ -136,9 +136,7 @@ func GenerateNewTempTokenAction(c echo.Context) error {
 
 				cc.AppContext.Database.Save(&exchangeModel)
 
-				exchangeModel.AccessToken = ""
-
-				return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: "", Success: true, Exchange: *exchangeModel})
+				return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: "", Success: true, Exchange: stripAccessToken(&exchangeModel)})
 			} else {
 				// Invalid access token
 				return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
@@ -150,6 +148,7 @@ func GenerateNewTempTokenAction(c echo.Context) error {
 	sentry.CaptureMessage(util.StrInvalidExchangeUUIDRequest+accessCredentialsForm.UUID)
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
 }
+
 
 // Revoke Temp Token godoc
 // @Summary Revokes an exchanges temp access token
@@ -206,9 +205,7 @@ func RevokeTempAccessTokenAction(c echo.Context) error {
 
 				cc.AppContext.Database.Save(&exchangeModel)
 
-				exchangeModel.AccessToken = ""
-
-				return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: "", Success: true, Exchange: *exchangeModel})
+				return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: "", Success: true, Exchange: stripAccessToken(&exchangeModel)})
 			} else {
 				// Invalid access token
 				return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
@@ -219,4 +216,9 @@ func RevokeTempAccessTokenAction(c echo.Context) error {
 	// If we got here the exchange uuid is invalid
 	sentry.CaptureMessage(util.StrInvalidExchangeUUIDRequest+accessCredentialsForm.UUID)
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
+}
+
+func stripAccessToken(exchangeModel *models.ExchangeModel) *models.ExchangeModel {
+	exchangeModel.AccessToken = ""
+	return *exchangeModel
 }
