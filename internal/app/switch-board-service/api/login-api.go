@@ -4,12 +4,12 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/forms"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/responses"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
-	"crypto/sha256"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/getsentry/raven-go"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
+	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
 )
@@ -43,28 +43,44 @@ func LoginAction(c echo.Context) error {
 		raven.CaptureError(userModelError, nil)
 		return c.JSON(http.StatusOK, &responses.LoginResponse{ErrorMessage: util.StrUserNotFoundError, Success: false})
 	}
-
-	if userModel.PasswordHash == fmt.Sprintf("%x", sha256.Sum256([]byte(loginForm.Password))) {
-
-		token := jwt.New(jwt.SigningMethodHS256)
-
-		// Set claims
-		claims := token.Claims.(jwt.MapClaims)
-		claims["name"] = userModel.FirstName + " " + userModel.LastName
-		claims["admin"] = true
-		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
-		claims["userModel"] = userModel
-
-		// Generate encoded token and send it as response.
-		createdToken, createdTokenError := token.SignedString([]byte(cc.AppContext.Config.JWTSecret))
-		if createdTokenError != nil {
-			raven.CaptureError(errors.Wrap(createdTokenError, "failed to create JWT token"), nil)
-			return createdTokenError
-		}
-		return c.JSON(http.StatusOK, &responses.LoginResponse{ErrorMessage: "", Success: true, AuthToken: "Bearer " + createdToken})
-	}else {
+	if err := verifyPassword(loginForm.Password, userModel.PasswordHash); err != nil {
+		raven.CaptureError(err, nil)
 		raven.CaptureMessage(fmt.Sprintf("Invalid authentication credentials; username=%s&password=%s&ip=%s",
 			loginForm.Username, loginForm.Password, c.RealIP()), nil)
+		return c.JSON(http.StatusOK, &responses.LoginResponse{
+			Success:      false,
+			ErrorMessage: util.StrInvalidLoginCredential,
+		})
 	}
-	return cc.Context.Redirect(http.StatusFound, "/login")
+	token := jwt.New(jwt.SigningMethodHS256)
+
+	// Set claims
+	claims := token.Claims.(jwt.MapClaims)
+	claims["name"] = userModel.FirstName + " " + userModel.LastName
+	claims["admin"] = true
+	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+	claims["userModel"] = userModel
+
+	// Generate encoded token and send it as response.
+	createdToken, createdTokenError := token.SignedString([]byte(cc.AppContext.Config.JWTSecret))
+	if createdTokenError != nil {
+		raven.CaptureError(errors.Wrap(createdTokenError, "failed to create JWT token"), nil)
+		return createdTokenError
+	}
+	return c.JSON(http.StatusOK, &responses.LoginResponse{ErrorMessage: "", Success: true, AuthToken: "Bearer " + createdToken})
+}
+
+func hashPassword(password string) (string, error) {
+	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hashed), nil
+}
+// verifyPassword will return nil if inputPassword is same as hashedPassword
+func verifyPassword(inputPassword, hashedPassword string) error {
+	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(inputPassword)); err != nil {
+		return err
+	}
+	return nil
 }
