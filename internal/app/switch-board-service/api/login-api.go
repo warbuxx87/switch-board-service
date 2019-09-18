@@ -4,12 +4,10 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/forms"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/responses"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/getsentry/sentry-go"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
 	"time"
 )
@@ -43,10 +41,8 @@ func LoginAction(c echo.Context) error {
 		sentry.CaptureException(userModelError)
 		return c.JSON(http.StatusOK, &responses.LoginResponse{ErrorMessage: util.StrUserNotFoundError, Success: false})
 	}
-	if err := verifyPassword(loginForm.Password, userModel.PasswordHash); err != nil {
+	if err := util.VerifyPassword(loginForm.Password, userModel.PasswordHash); err != nil {
 		sentry.CaptureException(err)
-		sentry.CaptureMessage(fmt.Sprintf("Invalid authentication credentials; username=%s&password=%s&ip=%s",
-			loginForm.Username, loginForm.Password, c.RealIP()))
 		return c.JSON(http.StatusOK, &responses.LoginResponse{
 			Success:      false,
 			ErrorMessage: util.StrInvalidLoginCredential,
@@ -67,19 +63,4 @@ func LoginAction(c echo.Context) error {
 		return createdTokenError
 	}
 	return c.JSON(http.StatusOK, &responses.LoginResponse{ErrorMessage: "", Success: true, AuthToken: "Bearer " + createdToken})
-}
-
-func hashPassword(password string) (string, error) {
-	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return "", err
-	}
-	return string(hashed), nil
-}
-// verifyPassword will return nil if inputPassword is same as hashedPassword
-func verifyPassword(inputPassword, hashedPassword string) error {
-	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(inputPassword)); err != nil {
-		return err
-	}
-	return nil
 }

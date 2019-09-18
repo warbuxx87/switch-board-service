@@ -16,7 +16,7 @@ require (
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/swaggo/swag v1.6.2
-	golang.org/x/crypto v0.0.0-20190907121410-71b5226ff739 // indirect
+	golang.org/x/crypto v0.0.0-20190907121410-71b5226ff739
 	golang.org/x/net v0.0.0-20190909003024-a7b16738d86b // indirect
 	golang.org/x/sys v0.0.0-20190907184412-d223b2b6db03 // indirect
 	golang.org/x/tools v0.0.0-20190909030654-5b82db07426d // indirect
