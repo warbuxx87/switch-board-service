@@ -5,8 +5,8 @@ import "github.com/jinzhu/gorm"
 type TradePairModel struct {
 	gorm.Model
 
-	UUID           string `json:"uuid" form:"uuid" query:"uuid"`
-	Name           string `json:"name" form:"name" query:"name"`
+	UUID           string `gorm:"unique_index" json:"uuid" form:"uuid" query:"uuid"`
+	Name           string `gorm:"unique_index" json:"name" form:"name" query:"name"`
 	BaseAsset      string `json:"base_asset" form:"base_asset" query:"base_asset"`
 	SecondaryAsset string `json:"secondary_asset" form:"secondary_asset" query:"secondary_asset"`
 }
