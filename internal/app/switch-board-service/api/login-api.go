@@ -53,7 +53,6 @@ func LoginAction(c echo.Context) error {
 		})
 	}
 	token := jwt.New(jwt.SigningMethodHS256)
-
 	// Set claims
 	claims := token.Claims.(jwt.MapClaims)
 	claims["name"] = userModel.FirstName + " " + userModel.LastName
