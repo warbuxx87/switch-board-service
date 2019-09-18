@@ -17,6 +17,7 @@ import (
 	"html/template"
 	"os"
 	"strconv"
+	"flag"
 )
 
 func connectToDatabase(config *util.Configuration) (*gorm.DB, error) {
@@ -63,9 +64,10 @@ func init() {
 // @BasePath /
 
 func main() {
-
+	configFilename := flag.String("cfgFileName", "dev.json", "Defaults to Development Json Configuration file: 'dev.json'.  Use flag -cfgFileName=config.json for production")
+	flag.Parse()
 	util.ShowBanner()
-	config, configLoadError := util.LoadConfigurationFile()
+	config, configLoadError := util.LoadConfigurationFile(*configFilename)
 	if configLoadError != nil {
 		logrus.Fatalf("failed to load app configuration; %v", configLoadError)
 		os.Exit(1)
