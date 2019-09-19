@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/crypto/bcrypt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -43,6 +44,23 @@ func LoadConfigurationFile(filename string) (*Configuration, error) {
 	}
 	return &configuration, nil
 }
+
+
+func HashPassword(password string) (string, error) {
+	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hashed), nil
+}
+// verifyPassword will return nil if inputPassword is same as hashedPassword
+func VerifyPassword(inputPassword, hashedPassword string) error {
+	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(inputPassword)); err != nil {
+		return err
+	}
+	return nil
+}
+
 
 func resolveConfigPath(filename string) (string, error) {
 	wd, err := os.Getwd()

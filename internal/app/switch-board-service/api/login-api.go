@@ -4,8 +4,6 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/forms"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/responses"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
-	"crypto/sha256"
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/getsentry/sentry-go"
 	"github.com/labstack/echo/v4"
@@ -43,28 +41,29 @@ func LoginAction(c echo.Context) error {
 		sentry.CaptureException(userModelError)
 		return c.JSON(http.StatusOK, &responses.LoginResponse{ErrorMessage: util.StrUserNotFoundError, Success: false})
 	}
-
-	if userModel.PasswordHash == fmt.Sprintf("%x", sha256.Sum256([]byte(loginForm.Password))) {
-
-		token := jwt.New(jwt.SigningMethodHS256)
-
-		// Set claims
-		claims := token.Claims.(jwt.MapClaims)
-		claims["name"] = userModel.FirstName + " " + userModel.LastName
-		claims["admin"] = true
-		claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
-		claims["userModel"] = userModel
-
-		// Generate encoded token and send it as response.
-		createdToken, createdTokenError := token.SignedString([]byte(cc.AppContext.Config.JWTSecret))
-		if createdTokenError != nil {
-			sentry.CaptureException(errors.Wrap(createdTokenError, "failed to create JWT token"))
-			return createdTokenError
-		}
-		return c.JSON(http.StatusOK, &responses.LoginResponse{ErrorMessage: "", Success: true, AuthToken: "Bearer " + createdToken})
-	}else {
-		sentry.CaptureMessage(fmt.Sprintf("Invalid authentication credentials; username=%s&password=%s&ip=%s",
-			loginForm.Username, loginForm.Password, c.RealIP()))
+	if err := util.VerifyPassword(loginForm.Password, userModel.PasswordHash); err != nil {
+		sentry.CaptureException(err)
+		return c.JSON(http.StatusOK, &responses.LoginResponse{
+			Success:      false,
+			ErrorMessage: util.StrInvalidLoginCredential,
+		})
 	}
-	return cc.Context.Redirect(http.StatusFound, "/login")
+	token := jwt.New(jwt.SigningMethodHS256)
+	// Set claims
+	claims := token.Claims.(jwt.MapClaims)
+	claims["name"] = userModel.FirstName + " " + userModel.LastName
+	claims["admin"] = true
+	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+	claims["userModel"] = userModel
+
+	// Generate encoded token and send it as response.
+	createdToken, createdTokenError := token.SignedString([]byte(cc.AppContext.Config.JWTSecret))
+	if createdTokenError != nil {
+		sentry.CaptureException(errors.Wrap(createdTokenError, "failed to create JWT token"))
+		return c.JSON(http.StatusOK, &responses.LoginResponse{
+			Success:      false,
+			ErrorMessage: util.StrAuthenticationFailed,
+		})
+	}
+	return c.JSON(http.StatusOK, &responses.LoginResponse{ErrorMessage: "", Success: true, AuthToken: "Bearer " + createdToken})
 }
