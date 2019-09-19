@@ -60,7 +60,10 @@ func LoginAction(c echo.Context) error {
 	createdToken, createdTokenError := token.SignedString([]byte(cc.AppContext.Config.JWTSecret))
 	if createdTokenError != nil {
 		sentry.CaptureException(errors.Wrap(createdTokenError, "failed to create JWT token"))
-		return createdTokenError
+		return c.JSON(http.StatusOK, &responses.LoginResponse{
+			Success:      false,
+			ErrorMessage: util.StrAuthenticationFailed,
+		})
 	}
 	return c.JSON(http.StatusOK, &responses.LoginResponse{ErrorMessage: "", Success: true, AuthToken: "Bearer " + createdToken})
 }
