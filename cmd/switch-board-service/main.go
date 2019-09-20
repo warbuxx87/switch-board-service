@@ -151,6 +151,9 @@ func main() {
 	e.POST("/v1/service/service_retrieve_all_exchanges", api.ServiceRetrieveAllExchangesAction)
 	e.POST("/v1/service/service_retrieve_all_trade_pairs", api.ServiceRetrieveAllTradePairsAction)
 
+	//Health
+	e.GET("/v1/health", api.HealthCheck)
+
 	r := e.Group("/v1/action")
 
 	r.Use(middleware.JWT([]byte(config.JWTSecret)))
