@@ -91,7 +91,7 @@ func generateDefaultConfig(filename string) error {
 func defaultConfig() *Configuration {
 	return &Configuration{
 		ListenIp:		"127.0.0.1",
-		ListenPort:		7280,
+		ListenPort:		7020,
 		SentryUrl:		"",
 		DatabaseName:		"db1",
 		DatabaseUsername:	"ubuntu",
