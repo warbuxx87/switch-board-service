@@ -152,7 +152,7 @@ func main() {
 	e.POST("/v1/service/service_retrieve_all_trade_pairs", api.ServiceRetrieveAllTradePairsAction)
 
 	//Health
-	e.GET("/v1/health", api.HealthCheck)
+	e.GET("/v1/health", api.HealthCheck(databaseConnection))
 
 	r := e.Group("/v1/action")
 
