@@ -85,7 +85,7 @@ func generateDefaultConfig(filename string) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(configPath, data, 0755)
+	return ioutil.WriteFile(configPath, data, 0664)
 }
 
 func defaultConfig() *Configuration {
