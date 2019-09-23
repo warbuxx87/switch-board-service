@@ -64,15 +64,18 @@ func init() {
 // @BasePath /
 
 func main() {
+	util.ShowBanner()
+
 	prod := flag.Bool("prod", false, "Use '$go run ./cmd/... -prod' to set to true, changing default configuration file from 'dev.json' to 'config.json'")
 	flag.Parse()
+
 	var configFilename string
 	if *prod {
 		configFilename = "config.json"
 	}else {
 		configFilename = "dev.json"
 	}
-	util.ShowBanner()
+
 	config, configLoadError := util.LoadConfigurationFile(configFilename)
 	if configLoadError != nil {
 		logrus.Fatalf("failed to load app configuration; %v", configLoadError)
@@ -85,19 +88,6 @@ func main() {
 		logrus.SetLevel(logrus.DebugLevel)
 		logrus.Info("Log Level: Debug")
 	}
-	databaseConnection, databaseError := connectToDatabase(config)
-	if databaseError != nil {
-		logrus.Errorf("failed to connect to database; %v", databaseError, nil)
-		os.Exit(1)
-	} else {
-		logrus.Info("Successfully connected to database")
-	}
-
-	// Create the data context
-	dataContext := util.DataContext{}
-
-	dataContext.Config = config
-	dataContext.Database = databaseConnection
 
 	sentrySetDSNError := sentry.Init(sentry.ClientOptions{
 		Dsn: config.SentryUrl,
@@ -106,6 +96,23 @@ func main() {
 	if sentrySetDSNError != nil {
 		logrus.WithFields(logrus.Fields{}).Error(sentrySetDSNError)
 	}
+
+	databaseConnection, databaseError := connectToDatabase(config)
+	if databaseError != nil {
+		logrus.Errorf("failed to connect to database; %v", databaseError, nil)
+		sentry.CaptureException(databaseError)
+		os.Exit(1)
+	} else {
+		logrus.Info(util.StrDatabaseConnect)
+		sentry.CaptureMessage(util.StrDatabaseConnect)
+	}
+
+	// Create the data context
+	dataContext := util.DataContext{}
+
+	dataContext.Config = config
+	dataContext.Database = databaseConnection
+
 
 	e := echo.New()
 	e.Debug = true
