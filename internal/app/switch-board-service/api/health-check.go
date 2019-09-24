@@ -3,10 +3,8 @@ package api
 import (
 	"net/http"
 	"github.com/labstack/echo/v4"
-//	"context"
-//	"database/sql"
-//	"time"
-	"github.com/jinzhu/gorm"
+	"fmt"
+	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
 )
 
 
@@ -20,29 +18,15 @@ import (
 // @Success 200
 // @Failure 503
 // @Router /v1/health [get]
-
-//func HealthCheck(c echo.Context, db *gorm.DB) echo.HandlerFunc {
-//	status := "DB Connection Healthy"
-	//if err := db.DB().Ping(); err != nil {
-	//	status = "DB Connection Unhealthy"
-	//	return echo.HandlerFunc(func(c echo.Context) {
-	//		return	c.String(503, status)
-	//	}())
-	//}
-//	return func(c *echo.Context) error {
-//		return echo.NewHTTPError(http.StatusOK, status)
-//	}(*c)
-//	return func(c *echo.Context) error {
-//		return echo.NewHTTPError(http.StatusUnauthorized)
-//	}
-//}
-func HealthCheck(db *gorm.DB) echo.HandlerFunc {
-    return func(c echo.Context) error {
-	status := "DB Connection Healthy"
-	if err := db.DB().Ping(); err != nil {
-		status = "DB Connection Unhealthy"
+func HealthCheck(c echo.Context) error {
+	cc := c.(*util.EndpointContext)
+	ccc := cc.AppContext
+	status := fmt.Sprintf("DB Connection Healthy, Errors: %d", ccc.DBErrors)
+	if err := ccc.Database.DB().Ping(); err != nil {
+		ccc.DBErrors++
+		status = fmt.Sprintf("DB Connection Unhealthy, Errors: %d", ccc.DBErrors)
 		return c.String(503, status)
 	}
-        return c.String(http.StatusOK, status)
-    }
+	return c.String(http.StatusOK, status)
 }
+

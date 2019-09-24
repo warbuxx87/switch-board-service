@@ -98,6 +98,8 @@ func main() {
 
 	dataContext.Config = config
 	dataContext.Database = databaseConnection
+	dataContext.DBErrors = 0
+	dataContext.AuthErrors = 0
 
 	sentrySetDSNError := sentry.Init(sentry.ClientOptions{
 		Dsn: config.SentryUrl,
@@ -152,7 +154,7 @@ func main() {
 	e.POST("/v1/service/service_retrieve_all_trade_pairs", api.ServiceRetrieveAllTradePairsAction)
 
 	//Health
-	e.GET("/v1/health", api.HealthCheck(databaseConnection))
+	e.GET("/v1/health", (api.HealthCheck))
 
 	r := e.Group("/v1/action")
 
