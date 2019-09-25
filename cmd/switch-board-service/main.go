@@ -154,6 +154,7 @@ func main() {
 	e.POST("/v1/service/service_retrieve_all_trade_pairs", api.ServiceRetrieveAllTradePairsAction)
 
 	//Health
+	go api.ContinuousHealthCheck(1, &dataContext)
 	e.GET("/v1/health", (api.HealthCheck))
 
 	r := e.Group("/v1/action")
