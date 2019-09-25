@@ -7,5 +7,6 @@
   "DatabaseUsername": "",
   "DatabasePassword": "",
   "LogLevel": 1,
-  "JWTSecret": "somesecret"
+  "JWTSecret": "somesecret",
+  "HealthCheckFrequency": 30
 }
