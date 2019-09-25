@@ -16,7 +16,6 @@ type Configuration struct {
 
 	SentryUrl string
 
-	DatabaseUrl      string
 	DatabaseName     string
 	DatabaseUsername string
 	DatabasePassword string
@@ -24,6 +23,8 @@ type Configuration struct {
 	JWTSecret string
 	// 0 = Info, 1 = Debug
 	LogLevel int
+
+	HealthCheckFrequency int
 }
 
 type ActionResult struct {
@@ -33,6 +34,11 @@ func LoadConfigurationFile(filename string) (*Configuration, error) {
 	configPath, err := resolveConfigPath(filename)
 	if err != nil {
 		return nil, err
+	}
+	if _, err := os.Stat(configPath); err != nil {
+	if err := generateDefaultConfig(filename); err != nil {
+		return nil, err
+		}
 	}
 	log.Printf("Loading configuration from %s", configPath)
 	configuration := Configuration{}
@@ -68,6 +74,33 @@ func resolveConfigPath(filename string) (string, error) {
 		return "", err
 	}
 	return filepath.Join(wd, "configs", filename), nil
+}
+
+func generateDefaultConfig(filename string) error {
+	configPath, err := resolveConfigPath(filename)
+	if err != nil {
+		return err
+	}
+	cfg := defaultConfig()
+	data, err := json.MarshalIndent(cfg, "", "\t")
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(configPath, data, 0664)
+}
+
+func defaultConfig() *Configuration {
+	return &Configuration{
+		ListenIp:		"127.0.0.1",
+		ListenPort:		7020,
+		SentryUrl:		"",
+		DatabaseName:		"db1",
+		DatabaseUsername:	"ubuntu",
+		DatabasePassword:	"pwd",
+		LogLevel:		1,
+		JWTSecret:		"somesecret",
+		HealthCheckFrequency:	30,
+	}
 }
 
 func ShowBanner() {
