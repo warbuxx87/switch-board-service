@@ -8,6 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
+	"strconv"
 )
 
 // Generalized Health Check endpoint
@@ -26,7 +27,7 @@ func HealthCheckAction(c echo.Context) error {
 	err := cc.AppContext.Database.DB().Ping()
 
 	if err != nil {
-		cc.AppContext.Errors.DBErrors = cc.AppContext.Errors.DBErrors + 1
+		cc.AppContext.Errors.DBErrors++
 
 		return c.JSON(http.StatusOK, &responses.HealthCheckResponse{CurrentlyHealthy: false,
 			AuthenticationErrors: cc.AppContext.Errors.AuthErrors, DatabaseConnectionErrors: cc.AppContext.Errors.DBErrors})
@@ -37,14 +38,16 @@ func HealthCheckAction(c echo.Context) error {
 		AuthenticationErrors: cc.AppContext.Errors.AuthErrors, DatabaseConnectionErrors: cc.AppContext.Errors.DBErrors})
 }
 
-func ContinuousHealthCheck(seconds int, dc *util.DataContext) {
+func ContinuousHealthCheck(dc *util.DataContext) {
+	dbHostname := "http://"+dc.Config.ListenIp+":"+strconv.Itoa(dc.Config.ListenPort)+"/v1/health"
+	logrus.Info("starting heath checks at: "+dbHostname)
 	for {
-		time.Sleep(time.Duration(seconds) * time.Second)
+		time.Sleep(time.Duration(dc.Config.HealthCheckFrequency) * time.Second)
 
-		healthCheckResponse, healthCheckResponseError := http.Get("http://127.0.0.1:7020/v1/health")
+		healthCheckResponse, healthCheckResponseError := http.Get(dbHostname)
 
 		if healthCheckResponseError != nil {
-			dc.Errors.DBErrors = dc.Errors.DBErrors + 1
+			dc.Errors.DBErrors++
 		} else {
 
 			var healthCheckResponseModel responses.HealthCheckResponse
@@ -52,12 +55,12 @@ func ContinuousHealthCheck(seconds int, dc *util.DataContext) {
 			decodeError := json.NewDecoder(healthCheckResponse.Body).Decode(&healthCheckResponseModel)
 
 			if decodeError != nil {
-				logrus.Error("Not sure what happened here")
-				dc.Errors.DBErrors = dc.Errors.DBErrors + 1
+				logrus.Error(util.StrHealthCheckFailed)
+				dc.Errors.DBErrors++
 			} else {
 
 				if healthCheckResponseModel.CurrentlyHealthy != true {
-					dc.Errors.DBErrors = dc.Errors.DBErrors + 1
+					dc.Errors.DBErrors++
 				}
 			}
 		}

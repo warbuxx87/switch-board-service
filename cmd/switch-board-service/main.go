@@ -22,9 +22,7 @@ import (
 
 func connectToDatabase(config *util.Configuration) (*gorm.DB, error) {
 
-	derp := config.DatabaseUsername+":"+config.DatabasePassword+"@"+config.DatabaseUrl+"/"+config.DatabaseName+"?charset=utf8&parseTime=True&loc=Local"
-	logrus.Info(derp)
-	database, databaseError := gorm.Open("mysql", config.DatabaseUsername+":"+config.DatabasePassword+"@("+config.DatabaseUrl+")/"+config.DatabaseName+"?charset=utf8&parseTime=True&loc=Local")
+	database, databaseError := gorm.Open("mysql", config.DatabaseUsername+":"+config.DatabasePassword+"@/"+config.DatabaseName+"?charset=utf8&parseTime=True&loc=Local")
 
 	if databaseError != nil {
 		return nil, databaseError
@@ -155,7 +153,7 @@ func main() {
 	e.POST("/v1/service/service_retrieve_all_trade_pairs", api.ServiceRetrieveAllTradePairsAction)
 
 	//Health
-	go api.ContinuousHealthCheck(1, &dataContext)
+	go api.ContinuousHealthCheck(&dataContext)
 	e.GET("/v1/health", api.HealthCheckAction)
 
 	r := e.Group("/v1/action")
