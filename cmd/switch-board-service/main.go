@@ -5,6 +5,7 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/models"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
 	"encoding/gob"
+	"flag"
 	"github.com/getsentry/sentry-go"
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
@@ -17,12 +18,13 @@ import (
 	"html/template"
 	"os"
 	"strconv"
-	"flag"
 )
 
 func connectToDatabase(config *util.Configuration) (*gorm.DB, error) {
 
-	database, databaseError := gorm.Open("mysql", config.DatabaseUsername+":"+config.DatabasePassword+"@/"+config.DatabaseName+"?charset=utf8&parseTime=True&loc=Local")
+	derp := config.DatabaseUsername+":"+config.DatabasePassword+"@"+config.DatabaseUrl+"/"+config.DatabaseName+"?charset=utf8&parseTime=True&loc=Local"
+	logrus.Info(derp)
+	database, databaseError := gorm.Open("mysql", config.DatabaseUsername+":"+config.DatabasePassword+"@("+config.DatabaseUrl+")/"+config.DatabaseName+"?charset=utf8&parseTime=True&loc=Local")
 
 	if databaseError != nil {
 		return nil, databaseError
@@ -69,7 +71,7 @@ func main() {
 	var configFilename string
 	if *prod {
 		configFilename = "config.json"
-	}else {
+	} else {
 		configFilename = "dev.json"
 	}
 	util.ShowBanner()
@@ -98,8 +100,7 @@ func main() {
 
 	dataContext.Config = config
 	dataContext.Database = databaseConnection
-	dataContext.DBErrors = 0
-	dataContext.AuthErrors = 0
+	dataContext.Errors = &util.ErrorsStruct{}
 
 	sentrySetDSNError := sentry.Init(sentry.ClientOptions{
 		Dsn: config.SentryUrl,
@@ -155,7 +156,7 @@ func main() {
 
 	//Health
 	go api.ContinuousHealthCheck(1, &dataContext)
-	e.GET("/v1/health", (api.HealthCheck))
+	e.GET("/v1/health", api.HealthCheckAction)
 
 	r := e.Group("/v1/action")
 
