@@ -21,8 +21,8 @@ import (
 // @Tags Exchange
 // @Param Authorization header string true "Authentication header"
 // @Param createExchangeModel body forms.CreateExchangeForm true "Add Exchange Form"
-// @Success 200 {object} responses.SuccessFailureResponse ""
-// @Failure 200 {object} responses.SuccessFailureResponse ""
+// @Success 200 {object} responses.ExchangeInfoResponse ""
+// @Failure 200 {object} responses.ExchangeInfoResponse ""
 // @Router /v1/action/create_exchange [post]
 func CreateExchangeAction(c echo.Context) error {
 
@@ -35,7 +35,7 @@ func CreateExchangeAction(c echo.Context) error {
 
 	if jsonBindError != nil {
 		sentry.CaptureException(jsonBindError)
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
+		return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: util.StrIncorrectParametersPassed, Success: false})
 	}
 
 	exchangeModel.Name = addExchangeForm.Name
@@ -46,10 +46,10 @@ func CreateExchangeAction(c echo.Context) error {
 
 	if createError != nil {
 		sentry.CaptureException(createError)
-		return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrAddExchangeFailedError, Success: false})
+		return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: util.StrAddExchangeFailedError, Success: false})
 	}
 
-	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: "", Success: true})
+	return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: "", Success: true, Exchange: *exchangeModel})
 
 }
 
@@ -219,6 +219,39 @@ func RetrieveExchangeInfoByExchangeTempTokenAction(c echo.Context) error {
 	}
 
 	// If we got here the exchange uuid is invalid
-	sentry.CaptureMessage(util.StrInvalidExchangeUUIDRequest+accessCredentialsForm.UUID)
+	sentry.CaptureMessage(util.StrInvalidExchangeUUIDRequest + accessCredentialsForm.UUID)
 	return c.JSON(http.StatusOK, &responses.SuccessFailureResponse{ErrorMessage: util.StrExchangeAccessTokenInvalid, Success: false})
+}
+
+// Refresh Exchange Access Token godoc
+// @Summary Refreshes an exchanges access token
+// @Description Refreshes an exchanges access token
+// @Accept  json
+// @Produce  json
+// @Tags Exchange
+// @Param Authorization header string true "Authentication header"
+// @Param exchangeUUID query string true "Exchange UUID"
+// @Success 200 {object} responses.ExchangeInfoResponse ""
+// @Failure 200 {object} responses.ExchangeInfoResponse ""
+// @Router /v1/action/refresh_exchange_access_token [get]
+func RefreshExchangeAccessTokenAction(c echo.Context) error {
+
+	cc := c.(*util.EndpointContext)
+
+	exchangeUUID := cc.Context.QueryParam("exchangeUUID")
+
+	exchangeModel := new(models.ExchangeModel)
+
+	findError := cc.AppContext.Database.Find(&exchangeModel, "uuid = ?", exchangeUUID).Error
+
+	if findError != nil {
+		sentry.CaptureException(findError)
+		return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: util.StrExchangeNotFoundError, Success: false})
+	}
+
+	exchangeModel.AccessToken = uuid.NewV4().String()
+
+	cc.AppContext.Database.Save(&exchangeModel)
+
+	return c.JSON(http.StatusOK, &responses.ExchangeInfoResponse{ErrorMessage: "", Success: true, Exchange: *exchangeModel})
 }

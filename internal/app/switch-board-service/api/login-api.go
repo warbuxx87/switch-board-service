@@ -41,6 +41,7 @@ func LoginAction(c echo.Context) error {
 		sentry.CaptureException(userModelError)
 		return c.JSON(http.StatusOK, &responses.LoginResponse{ErrorMessage: util.StrUserNotFoundError, Success: false})
 	}
+
 	if err := util.VerifyPassword(loginForm.Password, userModel.PasswordHash); err != nil {
 		sentry.CaptureException(err)
 		return c.JSON(http.StatusOK, &responses.LoginResponse{
