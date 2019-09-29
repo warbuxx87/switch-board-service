@@ -23,6 +23,8 @@ type Configuration struct {
 	JWTSecret string
 	// 0 = Info, 1 = Debug
 	LogLevel int
+
+	HealthCheckFrequency int
 }
 
 type ActionResult struct {
@@ -50,7 +52,6 @@ func LoadConfigurationFile(filename string) (*Configuration, error) {
 	return &configuration, nil
 }
 
-
 func HashPassword(password string) (string, error) {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -58,6 +59,7 @@ func HashPassword(password string) (string, error) {
 	}
 	return string(hashed), nil
 }
+
 // verifyPassword will return nil if inputPassword is same as hashedPassword
 func VerifyPassword(inputPassword, hashedPassword string) error {
 	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(inputPassword)); err != nil {
@@ -65,7 +67,6 @@ func VerifyPassword(inputPassword, hashedPassword string) error {
 	}
 	return nil
 }
-
 
 func resolveConfigPath(filename string) (string, error) {
 	wd, err := os.Getwd()
@@ -98,9 +99,9 @@ func defaultConfig() *Configuration {
 		DatabasePassword:	"pwd",
 		LogLevel:		1,
 		JWTSecret:		"somesecret",
+		HealthCheckFrequency:	30,
 	}
 }
-
 
 func ShowBanner() {
 

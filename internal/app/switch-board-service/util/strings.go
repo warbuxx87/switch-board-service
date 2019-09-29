@@ -29,5 +29,6 @@ var StrServiceKeysCouldNotBeRetrieved = "Error occurred while attempting to retr
 var StrServiceAccessTokenInvalid = "Error exchange id or access token is invalid. "
 
 var StrInvalidExchangeUUIDRequest = "Invalid Exchange UUID requested: "
+var StrHealthCheckFailed = "A Health Check Failed"
 
 var StrDatabaseConnect = "Successfully connected to database"

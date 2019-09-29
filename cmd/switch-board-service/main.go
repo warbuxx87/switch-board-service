@@ -5,6 +5,7 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/models"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
 	"encoding/gob"
+	"flag"
 	"github.com/getsentry/sentry-go"
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
@@ -17,7 +18,6 @@ import (
 	"html/template"
 	"os"
 	"strconv"
-	"flag"
 )
 
 func connectToDatabase(config *util.Configuration) (*gorm.DB, error) {
@@ -72,7 +72,7 @@ func main() {
 	var configFilename string
 	if *prod {
 		configFilename = "config.json"
-	}else {
+	} else {
 		configFilename = "dev.json"
 	}
 
@@ -112,6 +112,7 @@ func main() {
 
 	dataContext.Config = config
 	dataContext.Database = databaseConnection
+	dataContext.Errors = &util.ErrorsStruct{}
 
 
 	e := echo.New()
@@ -157,6 +158,10 @@ func main() {
 	e.POST("/v1/validate_access", api.ValidateAccessAction)
 	e.POST("/v1/service/service_retrieve_all_exchanges", api.ServiceRetrieveAllExchangesAction)
 	e.POST("/v1/service/service_retrieve_all_trade_pairs", api.ServiceRetrieveAllTradePairsAction)
+
+	//Health
+	go api.ContinuousHealthCheck(&dataContext)
+	e.GET("/v1/health", api.HealthCheckAction)
 
 	r := e.Group("/v1/action")
 

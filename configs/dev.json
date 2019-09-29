@@ -1,10 +1,11 @@
 {
-  "ListenIp": "127.0.0.1",
-  "ListenPort": 7020,
-  "SentryUrl": "",
-  "DatabaseName":"db1",
-  "DatabaseUsername": "ubuntu",
-  "DatabasePassword": "pwd",
-  "LogLevel": 1,
-  "JWTSecret": "somesecret"
+	"ListenIp": "127.0.0.1",
+	"ListenPort": 7020,
+	"SentryUrl": "",
+	"DatabaseName": "db1",
+	"DatabaseUsername": "ubuntu",
+	"DatabasePassword": "pwd",
+	"JWTSecret": "somesecret",
+	"LogLevel": 1,
+	"HealthCheckFrequency": 30
 }
