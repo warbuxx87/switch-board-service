@@ -3,23 +3,22 @@ package api
 import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/responses"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
-	"encoding/json"
+	"github.com/getsentry/sentry-go"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"net/http"
 	"time"
-	"strconv"
 )
 
 // Generalized Health Check endpoint
 // @Summary Validates that service is up and running
 // @Description Health Check for service
-// @Accept ---TBD---
-// @Produce http.response code
+// @Accept  json
+// @Produce  json
+// @Tags Exchange
 // @Tags  Health Check
-// @Param ---TBD---
-// @Success 200
-// @Failure 503
+// @Success 200 {object} responses.HealthCheckResponse ""
+// @Failure 200 {object} responses.HealthCheckResponse ""
 // @Router /v1/health [get]
 func HealthCheckAction(c echo.Context) error {
 	cc := c.(*util.EndpointContext)
@@ -27,7 +26,7 @@ func HealthCheckAction(c echo.Context) error {
 	err := cc.AppContext.Database.DB().Ping()
 
 	if err != nil {
-		cc.AppContext.Errors.DBErrors++
+		cc.AppContext.Errors.DBErrors = cc.AppContext.Errors.DBErrors + 1
 
 		return c.JSON(http.StatusOK, &responses.HealthCheckResponse{CurrentlyHealthy: false,
 			AuthenticationErrors: cc.AppContext.Errors.AuthErrors, DatabaseConnectionErrors: cc.AppContext.Errors.DBErrors})
@@ -39,30 +38,19 @@ func HealthCheckAction(c echo.Context) error {
 }
 
 func ContinuousHealthCheck(dc *util.DataContext) {
-	dbHostname := "http://"+dc.Config.ListenIp+":"+strconv.Itoa(dc.Config.ListenPort)+"/v1/health"
-	logrus.Info("starting heath checks at: "+dbHostname)
+
+	logrus.Info("Starting Health-Check routine.")
 	for {
 		time.Sleep(time.Duration(dc.Config.HealthCheckFrequency) * time.Second)
 
-		healthCheckResponse, healthCheckResponseError := http.Get(dbHostname)
+		err := dc.Database.DB().Ping()
 
-		if healthCheckResponseError != nil {
-			dc.Errors.DBErrors++
-		} else {
+		if err != nil {
+			dc.Errors.DBErrors = dc.Errors.DBErrors + 1
 
-			var healthCheckResponseModel responses.HealthCheckResponse
+			sentry.CaptureException(err)
+			logrus.Error("Error when connecting to database")
 
-			decodeError := json.NewDecoder(healthCheckResponse.Body).Decode(&healthCheckResponseModel)
-
-			if decodeError != nil {
-				logrus.Error(util.StrHealthCheckFailed)
-				dc.Errors.DBErrors++
-			} else {
-
-				if healthCheckResponseModel.CurrentlyHealthy != true {
-					dc.Errors.DBErrors++
-				}
-			}
 		}
 	}
 }

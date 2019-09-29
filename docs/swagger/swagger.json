@@ -18,7 +18,7 @@
     "paths": {
         "/v1/action/authorize_exchange": {
             "get": {
-                "description": "Authorizes an exchange",
+                "description": "Refreshes an exchanges access token",
                 "consumes": [
                     "application/json"
                 ],
@@ -28,7 +28,7 @@
                 "tags": [
                     "Exchange"
                 ],
-                "summary": "Authorizes an exchange",
+                "summary": "Refreshes an exchanges access token",
                 "parameters": [
                     {
                         "type": "string",
@@ -43,20 +43,14 @@
                         "name": "exchangeUUID",
                         "in": "query",
                         "required": true
-                    },
-                    {
-                        "type": "boolean",
-                        "description": "Should the exchange be authorized",
-                        "name": "exchangeAuthorized",
-                        "in": "query",
-                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.SuccessFailureResponse"
+                            "type": "object",
+                            "$ref": "#/definitions/responses.ExchangeInfoResponse"
                         }
                     }
                 }
@@ -98,7 +92,8 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/responses.SuccessFailureResponse"
+                            "type": "object",
+                            "$ref": "#/definitions/responses.ExchangeInfoResponse"
                         }
                     }
                 }
@@ -140,6 +135,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -182,6 +178,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/responses.ServiceKeyResponse"
                         }
                     }
@@ -224,6 +221,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -263,6 +261,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -305,6 +304,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -344,6 +344,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -383,6 +384,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -415,6 +417,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/responses.AllExchangesResponse"
                         }
                     }
@@ -447,6 +450,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/responses.AllServiceKeysResponse"
                         }
                     }
@@ -479,6 +483,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/responses.AllTradePairsResponse"
                         }
                     }
@@ -514,6 +519,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/responses.ExchangeInfoResponse"
                         }
                     }
@@ -549,7 +555,33 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/responses.ExchangeInfoResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/health": {
+            "get": {
+                "description": "Health Check for service",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Exchange",
+                    "Health Check"
+                ],
+                "summary": "Validates that service is up and running",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/responses.HealthCheckResponse"
                         }
                     }
                 }
@@ -584,6 +616,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/responses.LoginResponse"
                         }
                     }
@@ -619,6 +652,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -654,6 +688,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/responses.AllExchangesResponse"
                         }
                     }
@@ -689,6 +724,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/responses.AllExchangesResponse"
                         }
                     }
@@ -724,6 +760,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
+                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -915,6 +952,20 @@
                 },
                 "success": {
                     "type": "boolean"
+                }
+            }
+        },
+        "responses.HealthCheckResponse": {
+            "type": "object",
+            "properties": {
+                "authenticationErrors": {
+                    "type": "integer"
+                },
+                "currentlyHealthy": {
+                    "type": "boolean"
+                },
+                "databaseConnectionErrors": {
+                    "type": "integer"
                 }
             }
         },

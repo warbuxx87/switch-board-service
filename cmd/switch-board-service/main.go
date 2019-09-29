@@ -114,7 +114,6 @@ func main() {
 	dataContext.Database = databaseConnection
 	dataContext.Errors = &util.ErrorsStruct{}
 
-
 	e := echo.New()
 	e.Debug = true
 
@@ -172,6 +171,7 @@ func main() {
 	r.GET("/remove_exchange", api.RemoveExchangeAction)
 	r.GET("/authorize_exchange", api.AuthorizeExchangeAction)
 	r.GET("/retrieve_all_exchanges", api.RetrieveAllExchangesAction)
+	r.GET("/refresh_exchange_access_token", api.RefreshExchangeAccessTokenAction)
 
 	// Trade pair
 	r.POST("/create_trade_pair", api.CreateTradePairAction)
