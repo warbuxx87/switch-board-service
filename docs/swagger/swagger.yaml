@@ -172,7 +172,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: Refreshes an exchanges access token
+      description: Authorizes an exchange
       parameters:
       - description: Authentication header
         in: header
@@ -184,15 +184,20 @@ paths:
         name: exchangeUUID
         required: true
         type: string
+      - description: Should the exchange be authorized
+        in: query
+        name: exchangeAuthorized
+        required: true
+        type: boolean
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/responses.ExchangeInfoResponse'
+            $ref: '#/definitions/responses.SuccessFailureResponse'
             type: object
-      summary: Refreshes an exchanges access token
+      summary: Authorizes an exchange
       tags:
       - Exchange
   /v1/action/create_exchange:
@@ -311,6 +316,33 @@ paths:
       summary: Create a trade pair entry.
       tags:
       - TradePair
+  /v1/action/refresh_exchange_access_token:
+    get:
+      consumes:
+      - application/json
+      description: Refreshes an exchanges access token
+      parameters:
+      - description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Exchange UUID
+        in: query
+        name: exchangeUUID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/responses.ExchangeInfoResponse'
+            type: object
+      summary: Refreshes an exchanges access token
+      tags:
+      - Exchange
   /v1/action/remove_exchange:
     get:
       consumes:

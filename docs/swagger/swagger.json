@@ -18,7 +18,7 @@
     "paths": {
         "/v1/action/authorize_exchange": {
             "get": {
-                "description": "Refreshes an exchanges access token",
+                "description": "Authorizes an exchange",
                 "consumes": [
                     "application/json"
                 ],
@@ -28,7 +28,7 @@
                 "tags": [
                     "Exchange"
                 ],
-                "summary": "Refreshes an exchanges access token",
+                "summary": "Authorizes an exchange",
                 "parameters": [
                     {
                         "type": "string",
@@ -43,6 +43,13 @@
                         "name": "exchangeUUID",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Should the exchange be authorized",
+                        "name": "exchangeAuthorized",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -50,7 +57,7 @@
                         "description": "OK",
                         "schema": {
                             "type": "object",
-                            "$ref": "#/definitions/responses.ExchangeInfoResponse"
+                            "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
                 }
@@ -223,6 +230,46 @@
                         "schema": {
                             "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/action/refresh_exchange_access_token": {
+            "get": {
+                "description": "Refreshes an exchanges access token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Exchange"
+                ],
+                "summary": "Refreshes an exchanges access token",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authentication header",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Exchange UUID",
+                        "name": "exchangeUUID",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "$ref": "#/definitions/responses.ExchangeInfoResponse"
                         }
                     }
                 }

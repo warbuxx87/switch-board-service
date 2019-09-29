@@ -233,7 +233,7 @@ func RetrieveExchangeInfoByExchangeTempTokenAction(c echo.Context) error {
 // @Param exchangeUUID query string true "Exchange UUID"
 // @Success 200 {object} responses.ExchangeInfoResponse ""
 // @Failure 200 {object} responses.ExchangeInfoResponse ""
-// @Router /v1/action/authorize_exchange [get]
+// @Router /v1/action/refresh_exchange_access_token [get]
 func RefreshExchangeAccessTokenAction(c echo.Context) error {
 
 	cc := c.(*util.EndpointContext)
