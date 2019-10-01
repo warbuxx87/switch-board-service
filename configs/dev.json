@@ -2,9 +2,10 @@
   "ListenIp": "127.0.0.1",
   "ListenPort": 7020,
   "SentryUrl": "",
-  "DatabaseName":"db1",
-  "DatabaseUsername": "ubuntu",
-  "DatabasePassword": "pwd",
+  "DatabaseHost" : "database",
+  "DatabaseName":"switchboarddb",
+  "DatabaseUsername": "root",
+  "DatabasePassword": "switchpassword",
   "LogLevel": 1,
   "JWTSecret": "somesecret"
 }

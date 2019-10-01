@@ -5,6 +5,7 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/models"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
 	"encoding/gob"
+	"fmt"
 	"github.com/getsentry/sentry-go"
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
@@ -21,9 +22,11 @@ import (
 )
 
 func connectToDatabase(config *util.Configuration) (*gorm.DB, error) {
-
-	database, databaseError := gorm.Open("mysql", config.DatabaseUsername+":"+config.DatabasePassword+"@/"+config.DatabaseName+"?charset=utf8&parseTime=True&loc=Local")
-
+	// form a connectionURI: username:password@tcp(host:port)/databaseName?charset=utf8...
+	connectionUri := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
+		config.DatabaseUsername, config.DatabasePassword, config.DatabaseHost, 3306, config.DatabaseName)
+	logrus.Info("Connecting to ", connectionUri)
+	database, databaseError := gorm.Open("mysql", connectionUri)
 	if databaseError != nil {
 		return nil, databaseError
 	}

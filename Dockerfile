@@ -2,5 +2,5 @@ FROM alpine:3.9
 RUN apk update && apk add --no-cache ca-certificates
 RUN mkdir /app
 ADD . /app
-WORKDIR /app/cmd/switch-board-service
-ENTRYPOINT [ "./switch-board-service" ]
+WORKDIR /app
+ENTRYPOINT [ "/app/cmd/switch-board-service/switch-board-service" ]

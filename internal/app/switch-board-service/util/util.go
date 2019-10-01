@@ -16,6 +16,7 @@ type Configuration struct {
 
 	SentryUrl string
 
+	DatabaseHost string
 	DatabaseName     string
 	DatabaseUsername string
 	DatabasePassword string
