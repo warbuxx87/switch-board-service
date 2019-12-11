@@ -1,0 +1,49 @@
+image:                               atlassian/default-image:2
+
+pipelines:
+  default:
+    - step:
+        name:                        "Build and Test"
+        script:
+          - echo "Build, Upload and Test!"
+          - zip -r application.zip .
+          - pipe:                    atlassian/aws-elasticbeanstalk-deploy:0.2.3
+            variables:
+              AWS_ACCESS_KEY_ID:     $AWS_ACCESS_KEY_ID
+              AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+              AWS_DEFAULT_REGION:    $AWS_DEFAULT_REGION
+              APPLICATION_NAME:      'switch-board-service'
+              COMMAND:               'upload-only'
+              ZIP_FILE:              'application.zip'
+              VERSION_LABEL:         'switch-board-service-$BITBUCKET_BUILD_NUMBER'
+    - step:
+        name:                        "Deploy to Staging"
+        deployment:                  staging
+        script:
+        - echo "Deployment to Staging!"
+        - pipe:                      atlassian/aws-elasticbeanstalk-deploy:0.2.3
+          variables:
+            AWS_ACCESS_KEY_ID:       $AWS_ACCESS_KEY_ID
+            AWS_SECRET_ACCESS_KEY:   $AWS_SECRET_ACCESS_KEY
+            AWS_DEFAULT_REGION:      $AWS_DEFAULT_REGION
+            APPLICATION_NAME:        'switch-board-service'
+            COMMAND:                 'deploy-only'
+            VERSION_LABEL:           'alkemi-web-$BITBUCKET_BUILD_NUMBER'
+            ENVIRONMENT_NAME:        'switch-board-service-staging'
+            WAIT:                    'true'
+    - step:
+        name:                        "Deploy to Production"
+        deployment:                  production
+        trigger:                     manual
+        script:
+          - echo "Deployment to Production!"
+          - pipe:                    atlassian/aws-elasticbeanstalk-deploy:0.2.3
+            variables:
+              AWS_ACCESS_KEY_ID:     $AWS_ACCESS_KEY_ID
+              AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+              AWS_DEFAULT_REGION:    $AWS_DEFAULT_REGION
+              APPLICATION_NAME:      'switch-board-service'
+              COMMAND:               'deploy-only'
+              VERSION_LABEL:         'alkemi-web-$BITBUCKET_BUILD_NUMBER'
+              ENVIRONMENT_NAME:      'switch-board-service-production'
+              WAIT:                  'true'
