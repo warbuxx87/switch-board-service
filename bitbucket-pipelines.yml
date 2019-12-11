@@ -30,7 +30,7 @@ pipelines:
             APPLICATION_NAME:        'switch-board-service'
             COMMAND:                 'deploy-only'
             VERSION_LABEL:           'switch-board-service-$BITBUCKET_BUILD_NUMBER'
-            ENVIRONMENT_NAME:        'switch-board-service-staging'
+            ENVIRONMENT_NAME:        'service-staging'
             WAIT:                    'true'
     - step:
         name:                        "Deploy to Production"
@@ -46,5 +46,5 @@ pipelines:
               APPLICATION_NAME:      'switch-board-service'
               COMMAND:               'deploy-only'
               VERSION_LABEL:         'switch-board-service-$BITBUCKET_BUILD_NUMBER'
-              ENVIRONMENT_NAME:      'switch-board-service-production'
+              ENVIRONMENT_NAME:      'service-production'
               WAIT:                  'true'
