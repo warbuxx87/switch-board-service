@@ -2,10 +2,11 @@
   "ListenIp": "127.0.0.1",
   "ListenPort": 7020,
   "SentryUrl": "",
-  "DatabaseHost" : "database",
-  "DatabaseName":"switchboarddb",
-  "DatabaseUsername": "root",
+  "DatabaseHost": "aaojq6n89io2t.cwz6emzfnaqj.ca-central-1.rds.amazonaws.com",
+  "DatabaseName": "ebdb",
+  "DatabaseUsername": "switchuser",
   "DatabasePassword": "switchpassword",
   "LogLevel": 1,
-  "JWTSecret": "somesecret"
+  "JWTSecret": "somesecret",
+  "HealthCheckFrequency": 30
 }

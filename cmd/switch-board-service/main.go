@@ -5,11 +5,8 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/models"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
 	"encoding/gob"
-<<<<<<< HEAD
 	"fmt"
-=======
 	"flag"
->>>>>>> a32aeeaf986a0bbbed5e1da1060e3b5ae0783921
 	"github.com/getsentry/sentry-go"
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
