@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	"github.com/satori/go.uuid"
+	"github.com/sirupsen/logrus"
 	"net/http"
 )
 
@@ -17,10 +18,16 @@ func CheckForDefaultUser(database *gorm.DB, config *Configuration) {
 
 	if userModelError != nil {
 
+		newPasswordHash, passwordHashError := HashPassword("admin")
+
+		if passwordHashError != nil {
+			logrus.Error("Failed to generate password hash")
+		}
+
 		database.Create(&models.UserModel{
 			UUID: uuid.NewV4().String(),
 			Username:     "admin",
-			PasswordHash: "***REMOVED***",
+			PasswordHash: newPasswordHash,
 			FirstName:    "admin",
 			LastName:     "admin",
 			EmailAddress: "admin@admin.com",

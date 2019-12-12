@@ -5,7 +5,11 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/models"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
 	"encoding/gob"
+<<<<<<< HEAD
 	"fmt"
+=======
+	"flag"
+>>>>>>> a32aeeaf986a0bbbed5e1da1060e3b5ae0783921
 	"github.com/getsentry/sentry-go"
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
@@ -18,7 +22,6 @@ import (
 	"html/template"
 	"os"
 	"strconv"
-	"flag"
 )
 
 func connectToDatabase(config *util.Configuration) (*gorm.DB, error) {
@@ -67,15 +70,18 @@ func init() {
 // @BasePath /
 
 func main() {
+	util.ShowBanner()
+
 	prod := flag.Bool("prod", false, "Use '$go run ./cmd/... -prod' to set to true, changing default configuration file from 'dev.json' to 'config.json'")
 	flag.Parse()
+
 	var configFilename string
 	if *prod {
 		configFilename = "config.json"
-	}else {
+	} else {
 		configFilename = "dev.json"
 	}
-	util.ShowBanner()
+
 	config, configLoadError := util.LoadConfigurationFile(configFilename)
 	if configLoadError != nil {
 		logrus.Fatalf("failed to load app configuration; %v", configLoadError)
@@ -88,19 +94,6 @@ func main() {
 		logrus.SetLevel(logrus.DebugLevel)
 		logrus.Info("Log Level: Debug")
 	}
-	databaseConnection, databaseError := connectToDatabase(config)
-	if databaseError != nil {
-		logrus.Errorf("failed to connect to database; %v", databaseError, nil)
-		os.Exit(1)
-	} else {
-		logrus.Info("Successfully connected to database")
-	}
-
-	// Create the data context
-	dataContext := util.DataContext{}
-
-	dataContext.Config = config
-	dataContext.Database = databaseConnection
 
 	sentrySetDSNError := sentry.Init(sentry.ClientOptions{
 		Dsn: config.SentryUrl,
@@ -109,6 +102,23 @@ func main() {
 	if sentrySetDSNError != nil {
 		logrus.WithFields(logrus.Fields{}).Error(sentrySetDSNError)
 	}
+
+	databaseConnection, databaseError := connectToDatabase(config)
+	if databaseError != nil {
+		logrus.Errorf("failed to connect to database; %v", databaseError, nil)
+		sentry.CaptureException(databaseError)
+		os.Exit(1)
+	} else {
+		logrus.Info(util.StrDatabaseConnect)
+		sentry.CaptureMessage(util.StrDatabaseConnect)
+	}
+
+	// Create the data context
+	dataContext := util.DataContext{}
+
+	dataContext.Config = config
+	dataContext.Database = databaseConnection
+	dataContext.Errors = &util.ErrorsStruct{}
 
 	e := echo.New()
 	e.Debug = true
@@ -154,6 +164,10 @@ func main() {
 	e.POST("/v1/service/service_retrieve_all_exchanges", api.ServiceRetrieveAllExchangesAction)
 	e.POST("/v1/service/service_retrieve_all_trade_pairs", api.ServiceRetrieveAllTradePairsAction)
 
+	//Health
+	go api.ContinuousHealthCheck(&dataContext)
+	e.GET("/v1/health", api.HealthCheckAction)
+
 	r := e.Group("/v1/action")
 
 	r.Use(middleware.JWT([]byte(config.JWTSecret)))
@@ -163,6 +177,7 @@ func main() {
 	r.GET("/remove_exchange", api.RemoveExchangeAction)
 	r.GET("/authorize_exchange", api.AuthorizeExchangeAction)
 	r.GET("/retrieve_all_exchanges", api.RetrieveAllExchangesAction)
+	r.GET("/refresh_exchange_access_token", api.RefreshExchangeAccessTokenAction)
 
 	// Trade pair
 	r.POST("/create_trade_pair", api.CreateTradePairAction)

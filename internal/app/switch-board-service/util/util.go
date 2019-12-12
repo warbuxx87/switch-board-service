@@ -24,51 +24,104 @@ type Configuration struct {
 	JWTSecret string
 	// 0 = Info, 1 = Debug
 	LogLevel int
+
+	HealthCheckFrequency int
 }
 
 type ActionResult struct {
 }
 
 func LoadConfigurationFile(filename string) (*Configuration, error) {
-	configPath, err := resolveConfigPath(filename)
-	if err != nil {
-		return nil, err
+
+	configPath, configPathError := resolveConfigPath(filename)
+
+	if configPathError != nil {
+		return nil, configPathError
 	}
+
+	_, configPathCheckError := os.Stat(configPath)
+
+	if configPathCheckError != nil {
+		if err := generateDefaultConfig(filename); err != nil {
+			return nil, err
+		}
+	}
+
 	log.Printf("Loading configuration from %s", configPath)
 	configuration := Configuration{}
-	data, err := ioutil.ReadFile(configPath)
-	if err != nil {
-		return nil, err
+
+	data, dataReadError := ioutil.ReadFile(configPath)
+
+	if dataReadError != nil {
+		return nil, dataReadError
 	}
-	if err := json.Unmarshal(data, &configuration); err != nil {
-		return nil, err
+
+	jsonUnMarshalError := json.Unmarshal(data, &configuration);
+	if jsonUnMarshalError != nil {
+		return nil, jsonUnMarshalError
 	}
+
 	return &configuration, nil
 }
 
-
 func HashPassword(password string) (string, error) {
-	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return "", err
+	generatedHash, generateHashError := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
+	if generateHashError != nil {
+		return "", generateHashError
 	}
-	return string(hashed), nil
+
+	return string(generatedHash), nil
 }
+
 // verifyPassword will return nil if inputPassword is same as hashedPassword
 func VerifyPassword(inputPassword, hashedPassword string) error {
-	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(inputPassword)); err != nil {
-		return err
+	compareHashError := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(inputPassword));
+	if compareHashError != nil {
+		return compareHashError
 	}
+
 	return nil
 }
 
-
 func resolveConfigPath(filename string) (string, error) {
-	wd, err := os.Getwd()
-	if err != nil {
-		return "", err
+	currentWorkingDirectory, currentWorkingDirectoryError := os.Getwd()
+	if currentWorkingDirectoryError != nil {
+		return "", currentWorkingDirectoryError
 	}
-	return filepath.Join(wd, "configs", filename), nil
+	return filepath.Join(currentWorkingDirectory, "configs", filename), nil
+}
+
+func generateDefaultConfig(filename string) error {
+
+	configPath, configPathError := resolveConfigPath(filename)
+
+	if configPathError != nil {
+		return configPathError
+	}
+
+	cfg := defaultConfig()
+	data, jsonMarshalError := json.MarshalIndent(cfg, "", "\t")
+
+	if jsonMarshalError != nil {
+		return jsonMarshalError
+	}
+
+	return ioutil.WriteFile(configPath, data, 0664)
+}
+
+func defaultConfig() *Configuration {
+	return &Configuration{
+		ListenIp:             "127.0.0.1",
+		ListenPort:           7020,
+		SentryUrl:            "",
+		DatabaseName:         "db1",
+		DatabaseUsername:     "ubuntu",
+		DatabasePassword:     "pwd",
+		LogLevel:             1,
+		JWTSecret:            "somesecret",
+		HealthCheckFrequency: 30,
+	}
 }
 
 func ShowBanner() {
