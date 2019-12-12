@@ -4,3 +4,4 @@ RUN mkdir /app
 ADD . /app
 WORKDIR /app
 ENTRYPOINT [ "/app/cmd/switch-board-service/switch-board-service" ]
+EXPOSE 7020
