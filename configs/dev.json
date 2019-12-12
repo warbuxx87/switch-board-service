@@ -1,4 +1,16 @@
 {
+<<<<<<< HEAD
+  "ListenIp": "127.0.0.1",
+  "ListenPort": 7020,
+  "SentryUrl": "",
+  "DatabaseHost" : "database",
+  "DatabaseName":"switchboarddb",
+  "DatabaseUsername": "root",
+  "DatabasePassword": "switchpassword",
+  "LogLevel": 1,
+  "JWTSecret": "somesecret"
+}
+=======
 	"ListenIp": "127.0.0.1",
 	"ListenPort": 7020,
 	"SentryUrl": "",
@@ -9,3 +21,4 @@
 	"LogLevel": 1,
 	"HealthCheckFrequency": 30
 }
+>>>>>>> a32aeeaf986a0bbbed5e1da1060e3b5ae0783921
