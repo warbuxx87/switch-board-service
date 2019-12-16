@@ -3,5 +3,5 @@ RUN apk update && apk add --no-cache ca-certificates
 RUN mkdir /app
 ADD . /app
 WORKDIR /app
-EXPOSE 7020
+EXPOSE 80
 ENTRYPOINT [ "/app/cmd/switch-board-service/switch-board-service" ]
