@@ -17,6 +17,8 @@ pipelines:
               COMMAND:               'upload-only'
               ZIP_FILE:              'docker-multicontainer-v2.zip'
               VERSION_LABEL:         'switch-board-service-$BITBUCKET_BUILD_NUMBER'
+        artifacts:
+        - docker-multicontainer-v2.zip
     - step:
         name:                        "Deploy to Staging"
         deployment:                  staging
