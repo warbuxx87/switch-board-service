@@ -1,7 +1,6 @@
 {
   "AWSEBDockerrunVersion": 2,
-  "volumes": [
-    {
+  "volumes": [{
       "name": "switch-board-service",
       "host": {
         "sourcePath": "."
@@ -14,20 +13,16 @@
       }
     }
   ],
-  "containerDefinitions": [
-    {
+  "containerDefinitions": [{
       "name": "switch-board-service",
       "image": "alpine:3.9",
       "essential": true,
       "memory": 512,
-      "portMappings": [
-        {
-          "hostPort": 80,
-          "containerPort": 7020
-        }
-      ],
-      "mountPoints": [
-        {
+      "portMappings": [{
+        "hostPort": 80,
+        "containerPort": 7020
+      }],
+      "mountPoints": [{
           "sourceVolume": "switch-board-service",
           "containerPath": ".",
           "readOnly": true
@@ -43,25 +38,27 @@
       "image": "mysql:5.7",
       "essential": true,
       "memory": 512,
-      "portMappings": [
+      "portMappings": [{
+        "hostPort": 3306,
+        "containerPort": 3306
+      }],
+      "environment": [{
+          "name": "MYSQL_USERNAME",
+          "value": "switchuser"
+        },
         {
-          "hostPort": 3306,
-          "containerPort": 3306
-        }
-      ],
-      "environment": [
+          "name": "MYSQL_PASSWORD",
+          "value": "switchpassword"
+        },
         {
-          "MYSQL_PASSWORD": "dbpassword",
-          "MYSQL_DATABASE": "switchboarddb",
-          "MYSQL_ROOT_PASSWORD": "switchpassword",
-          "command": "--default-authentication-plugin=mysql_native_password"
+          "name": "MYSQL_DATABASE",
+          "value": "switchboarddb"
         }
       ],
       "links": [
         "switch-board-service"
       ],
-      "mountPoints": [
-        {
+      "mountPoints": [{
           "sourceVolume": "switch-board-service",
           "containerPath": ".",
           "readOnly": true
