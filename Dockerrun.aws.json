@@ -1,0 +1,77 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "volumes": [
+    {
+      "name": "switch-board-service",
+      "host": {
+        "sourcePath": "."
+      }
+    },
+    {
+      "name": "switch_database",
+      "host": {
+        "sourcePath": "."
+      }
+    }
+  ],
+  "containerDefinitions": [
+    {
+      "name": "switch-board-service",
+      "image": "alpine:3.9",
+      "essential": true,
+      "memory": 512,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 7020
+        }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "switch-board-service",
+          "containerPath": ".",
+          "readOnly": true
+        },
+        {
+          "sourceVolume": "awseb-logs-switch-board-service",
+          "containerPath": "/var/log/switch-board-service"
+        }
+      ]
+    },
+    {
+      "name": "switch_database",
+      "image": "mysql:5.7",
+      "essential": true,
+      "memory": 512,
+      "portMappings": [
+        {
+          "hostPort": 3306,
+          "containerPort": 3306
+        }
+      ],
+      "environment": [
+        {
+          "MYSQL_PASSWORD": "dbpassword",
+          "MYSQL_DATABASE": "switchboarddb",
+          "MYSQL_ROOT_PASSWORD": "switchpassword",
+          "command": "--default-authentication-plugin=mysql_native_password"
+        }
+      ],
+      "links": [
+        "switch-board-service"
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "switch-board-service",
+          "containerPath": ".",
+          "readOnly": true
+        },
+        {
+          "sourceVolume": "switch_database",
+          "containerPath": "/Users/user/mnt/db_data:/mnt/db_data",
+          "readOnly": true
+        }
+      ]
+    }
+  ]
+}
