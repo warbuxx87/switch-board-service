@@ -23,10 +23,10 @@ import (
 
 func connectToDatabase(config *util.Configuration) (*gorm.DB, error) {
 	// form a connectionURI: username:password@tcp(host:port)/databaseName?charset=utf8...
-	connectionUri := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
+	connectionURI := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
 		config.DatabaseUsername, config.DatabasePassword, config.DatabaseHost, 3306, config.DatabaseName)
-	logrus.Info("Connecting to ", connectionUri)
-	database, databaseError := gorm.Open("mysql", connectionUri)
+	logrus.Info("Connecting to ", connectionURI)
+	database, databaseError := gorm.Open("mysql", connectionURI)
 	if databaseError != nil {
 		return nil, databaseError
 	}
@@ -63,7 +63,7 @@ func init() {
 // @in header
 // @name Authorization
 
-// @host https://switchboard-api.alkemi.tech
+// @host switchboard-api.alkemi.tech
 // @BasePath /
 
 func main() {
@@ -102,7 +102,7 @@ func main() {
 
 	databaseConnection, databaseError := connectToDatabase(config)
 	if databaseError != nil {
-		logrus.Errorf("failed to connect to database; %v", databaseError, nil)
+		logrus.Errorf("failed to connect to database; %v", databaseError)
 		sentry.CaptureException(databaseError)
 		os.Exit(1)
 	} else {
