@@ -22,8 +22,8 @@ pipelines:
           - echo "Installing spectacle"
           - npm install -g spectacle-docs
           - echo "Generating New Docs"
-          - rm -r exchange-container-api
-          - spectacle -t switch-board-api $BITBUCKET_CLONE_DIR/docs/swagger/swagger.json
+          - rm -r switchboard-api
+          - spectacle -t switchboard-api $BITBUCKET_CLONE_DIR/docs/swagger/swagger.json
           - echo "Pushing back to Github"
           - COMMIT_MSG="API Docs switch-board-service-$BITBUCKET_BUILD_NUMBER"
           - echo $COMMIT_MSG
