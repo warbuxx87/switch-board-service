@@ -2,32 +2,7 @@ image:                                 golang:1.12.6-alpine
 
 pipelines:
   default:
-    - step:
-        name:                          "Push Documentation to Github"
-        script:
-          - echo "Update Documentation"
-          - cd $BITBUCKET_CLONE_DIR
-          - echo "Installing dependencies"
-          - apk add --nocache --update gcc musl-dev nodejs npm git mercurial openssh
-          - apk update && apk add --no-cache ca-certificates
-          - git config --global url."git@bitbucket.org:".insteadOf "https://bitbucket.org/"
-          - git config --global user.email "ryan@alkemi.ai"
-          - echo "Generating API Docs"
-          - go get -v
-          - go mod vendor
-          - go get -u github.com/swaggo/swag/cmd/swag
-          - swag init -g cmd/switch-board-service/main.go --output docs/swagger/
-          - echo "Cloning Github api-docs"
-          - cd .. && git clone git@github.com:project-alkemi/api-docs.git && cd api-docs
-          - echo "Installing spectacle"
-          - npm install -g spectacle-docs
-          - echo "Generating New Docs"
-          - rm -r switchboard-api
-          - spectacle -t switchboard-api $BITBUCKET_CLONE_DIR/docs/swagger/swagger.json
-          - echo "Pushing back to Github"
-          - COMMIT_MSG="API Docs switch-board-service-$BITBUCKET_BUILD_NUMBER"
-          - echo $COMMIT_MSG
-          - git add . && git commit -m "$COMMIT_MSG" && git push
+
     - step:
         name:                          "Test & Build"
         deployment:                    test
@@ -58,23 +33,48 @@ pipelines:
                 COMMAND:               'upload-only'
                 ZIP_FILE:              'application.zip'
                 VERSION_LABEL:         'switch-board-service-$BITBUCKET_BUILD_NUMBER'
-          artifacts:
-          - docker-multicontainer-v2.zip
-      - step:
-          name:                        "Deploy to Staging"
-          deployment:                  staging
-          script:
-          - echo "Deployment to Staging!"
-          - pipe:                      atlassian/aws-elasticbeanstalk-deploy:0.2.3
-            variables:
-              AWS_ACCESS_KEY_ID:       $AWS_ACCESS_KEY_ID
-              AWS_SECRET_ACCESS_KEY:   $AWS_SECRET_ACCESS_KEY
-              AWS_DEFAULT_REGION:      $AWS_DEFAULT_REGION
-              APPLICATION_NAME:        'switch-board-service'
-              COMMAND:                 'deploy-only'
-              VERSION_LABEL:           'switch-board-service-$BITBUCKET_BUILD_NUMBER'
-              ENVIRONMENT_NAME:        'switch-board-staging'
-              WAIT:                    'true'
+      - parallel:
+        - step:
+            name:                      "Push Documentation to Github"
+            script:
+              - echo "Update Documentation"
+              - cd $BITBUCKET_CLONE_DIR
+              - echo "Installing dependencies"
+              - apk add --nocache --update gcc musl-dev nodejs npm git mercurial openssh
+              - apk update && apk add --no-cache ca-certificates
+              - git config --global url."git@bitbucket.org:".insteadOf "https://bitbucket.org/"
+              - git config --global user.email "ryan@alkemi.ai"
+              - echo "Generating API Docs"
+              - go get -v
+              - go mod vendor
+              - go get -u github.com/swaggo/swag/cmd/swag
+              - swag init -g cmd/switch-board-service/main.go --output docs/swagger/
+              - echo "Cloning Github api-docs"
+              - cd .. && git clone git@github.com:project-alkemi/api-docs.git && cd api-docs
+              - echo "Installing spectacle"
+              - npm install -g spectacle-docs
+              - echo "Generating New Docs"
+              - rm -r switchboard-api
+              - spectacle -t switchboard-api $BITBUCKET_CLONE_DIR/docs/swagger/swagger.json
+              - echo "Pushing back to Github"
+              - COMMIT_MSG="API Docs switch-board-service-$BITBUCKET_BUILD_NUMBER"
+              - echo $COMMIT_MSG
+              - git add . && git commit -m "$COMMIT_MSG" && git push
+        - step:
+            name:                      "Deploy to Staging"
+            deployment:                staging
+            script:
+            - echo "Deployment to Staging!"
+            - pipe:                    atlassian/aws-elasticbeanstalk-deploy:0.2.3
+              variables:
+                AWS_ACCESS_KEY_ID:     $AWS_ACCESS_KEY_ID
+                AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+                AWS_DEFAULT_REGION:    $AWS_DEFAULT_REGION
+                APPLICATION_NAME:      'switch-board-service'
+                COMMAND:               'deploy-only'
+                VERSION_LABEL:         'switch-board-service-$BITBUCKET_BUILD_NUMBER'
+                ENVIRONMENT_NAME:      'switch-board-staging'
+                WAIT:                  'true'
       - step:
           name:                        "Deploy to Production"
           deployment:                  production
