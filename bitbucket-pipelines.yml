@@ -1,4 +1,45 @@
-image:                               atlassian/default-image:2
+image:                               golang:1.12.6-alpine
+
+pipelines:
+  default:
+    - step:
+        name:                        "Push Documentation to Github"
+        script:
+          - echo "Update Documentation"
+          - cd $BITBUCKET_CLONE_DIR
+          - echo "Installing dependencies"
+          - apk add --nocache --update gcc musl-dev nodejs npm git mercurial openssh
+          - apk update && apk add --no-cache ca-certificates
+          - git config --global url."git@bitbucket.org:".insteadOf "https://bitbucket.org/"
+          - git config --global user.email "ryan@alkemi.ai"
+          - echo "Generating API Docs"
+          - go get -v
+          - go mod vendor
+          - go get -u github.com/swaggo/swag/cmd/swag
+          - swag init -g cmd/switch-board-service/main.go --output docs/swagger/
+          - echo "Cloning Github api-docs"
+          - cd .. && git clone git@github.com:project-alkemi/api-docs.git && cd api-docs
+          - echo "Installing spectacle"
+          - npm install -g spectacle-docs
+          - echo "Generating New Docs"
+          - rm -r exchange-container-api
+          - spectacle -t switch-board-api $BITBUCKET_CLONE_DIR/docs/swagger/swagger.json
+          - echo "Pushing back to Github"
+          - COMMIT_MSG="API Docs switch-board-service-$BITBUCKET_BUILD_NUMBER"
+          - echo $COMMIT_MSG
+          - git add . && git commit -m "$COMMIT_MSG" && git push
+    - step:
+        name:                        "Test & Build"
+        deployment:                  test
+        script:
+          - echo "Test & Build"
+          - set -ex && apk add --no-cache gcc musl-dev git mercurial zip openssh
+          - apk update && apk add --no-cache ca-certificates
+          - git config --global url."git@bitbucket.org:".insteadOf "https://bitbucket.org/"
+          - go get -v
+          - go mod vendor
+          - go test -v -mod=vendor cmd/switch-board-service/main.go
+          - cd cmd/switch-board-service && CGO_ENABLED=1 GOOS=linux go build -v -mod=vendor -o switch-board-service -a -installsuffix cgo -ldflags '-w'
 
 pipelines:
   default:

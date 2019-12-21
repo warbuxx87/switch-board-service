@@ -52,9 +52,9 @@ func init() {
 // @version 1.0
 // @description This service manages the authorization for exchanges and trade pairs
 
-// @contact.name Raynaldo Rivera
-// @contact.url https://alkemi.ai
-// @contact.email royal@alkemi.ai
+// @contact.name Alkemi
+// @contact.url https://alkemi.network
+// @contact.email dev@alkemi.ai
 
 // @license.name Proprietary
 // @license.url
@@ -63,7 +63,7 @@ func init() {
 // @in header
 // @name Authorization
 
-// @host 127.0.0.1:7020
+// @host https://switchboard-api.alkemi.tech
 // @BasePath /
 
 func main() {
