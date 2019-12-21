@@ -13,6 +13,7 @@ require (
 	github.com/labstack/echo-contrib v0.6.0
 	github.com/labstack/echo/v4 v4.1.10
 	github.com/pkg/errors v0.8.1
+	github.com/robertkrimen/godocdown v0.0.0-20130622164427-0bfa04905481 // indirect
 	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/swaggo/swag v1.6.2

@@ -156,12 +156,12 @@ definitions:
       success:
         type: boolean
     type: object
-host: 127.0.0.1:7020
+host: https://switchboard-api.alkemi.tech
 info:
   contact:
-    email: royal@alkemi.ai
-    name: Raynaldo Rivera
-    url: https://alkemi.ai
+    email: dev@alkemi.ai
+    name: Alkemi
+    url: https://alkemi.network
   description: This service manages the authorization for exchanges and trade pairs
   license:
     name: Proprietary
@@ -196,7 +196,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Authorizes an exchange
       tags:
       - Exchange
@@ -225,7 +224,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.ExchangeInfoResponse'
-            type: object
       summary: Create a new exchange entry.
       tags:
       - Exchange
@@ -254,7 +252,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Associates a exchange and trade pair
       tags:
       - TradePair
@@ -283,7 +280,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.ServiceKeyResponse'
-            type: object
       summary: Create a service key entry .
       tags:
       - Service
@@ -312,7 +308,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Create a trade pair entry.
       tags:
       - TradePair
@@ -339,7 +334,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.ExchangeInfoResponse'
-            type: object
       summary: Refreshes an exchanges access token
       tags:
       - Exchange
@@ -366,7 +360,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Removes a existing exchange entry.
       tags:
       - Exchange
@@ -395,7 +388,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Removes a exchange and trade pair association
       tags:
       - TradePair
@@ -422,7 +414,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Removes a service key entry
       tags:
       - Service
@@ -449,7 +440,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Removes a trade pair entry.
       tags:
       - TradePair
@@ -471,7 +461,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.AllExchangesResponse'
-            type: object
       summary: Retrieve all exchanges .
       tags:
       - Exchange
@@ -493,7 +482,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.AllServiceKeysResponse'
-            type: object
       summary: Retrieve all service key entries .
       tags:
       - Service
@@ -515,7 +503,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.AllTradePairsResponse'
-            type: object
       summary: Retrieve all trade pairs .
       tags:
       - TradePair
@@ -539,7 +526,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.ExchangeInfoResponse'
-            type: object
       summary: Retrieve exchange info by temp token .
       tags:
       - Exchange
@@ -563,7 +549,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.ExchangeInfoResponse'
-            type: object
       summary: Generate a new temp token for a exchange
       tags:
       - Public
@@ -579,7 +564,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.HealthCheckResponse'
-            type: object
       summary: Validates that service is up and running
       tags:
       - Exchange
@@ -605,7 +589,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.LoginResponse'
-            type: object
       summary: Login and receive JWT token.
       tags:
       - Public
@@ -629,7 +612,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Revokes an exchanges temp access token
       tags:
       - Public
@@ -653,7 +635,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.AllExchangesResponse'
-            type: object
       summary: Retrieve all exchanges .
       tags:
       - Service-Endpoints
@@ -677,7 +658,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.AllExchangesResponse'
-            type: object
       summary: Retrieve all trade pair entries .
       tags:
       - Service-Endpoints
@@ -701,7 +681,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/responses.SuccessFailureResponse'
-            type: object
       summary: Validates exchanges and service credentials
       tags:
       - Public

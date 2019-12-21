@@ -4,16 +4,16 @@
         "description": "This service manages the authorization for exchanges and trade pairs",
         "title": "Alkemi - Switch Board Service",
         "contact": {
-            "name": "Raynaldo Rivera",
-            "url": "https://alkemi.ai",
-            "email": "royal@alkemi.ai"
+            "name": "Alkemi",
+            "url": "https://alkemi.network",
+            "email": "dev@alkemi.ai"
         },
         "license": {
             "name": "Proprietary"
         },
         "version": "1.0"
     },
-    "host": "127.0.0.1:7020",
+    "host": "https://switchboard-api.alkemi.tech",
     "basePath": "/",
     "paths": {
         "/v1/action/authorize_exchange": {
@@ -56,7 +56,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -99,7 +98,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.ExchangeInfoResponse"
                         }
                     }
@@ -142,7 +140,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -185,7 +182,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.ServiceKeyResponse"
                         }
                     }
@@ -228,7 +224,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -268,7 +263,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.ExchangeInfoResponse"
                         }
                     }
@@ -308,7 +302,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -351,7 +344,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -391,7 +383,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -431,7 +422,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -464,7 +454,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.AllExchangesResponse"
                         }
                     }
@@ -497,7 +486,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.AllServiceKeysResponse"
                         }
                     }
@@ -530,7 +518,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.AllTradePairsResponse"
                         }
                     }
@@ -566,7 +553,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.ExchangeInfoResponse"
                         }
                     }
@@ -602,7 +588,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.ExchangeInfoResponse"
                         }
                     }
@@ -627,7 +612,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.HealthCheckResponse"
                         }
                     }
@@ -663,7 +647,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.LoginResponse"
                         }
                     }
@@ -699,7 +682,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }
@@ -735,7 +717,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.AllExchangesResponse"
                         }
                     }
@@ -771,7 +752,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.AllExchangesResponse"
                         }
                     }
@@ -807,7 +787,6 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "object",
                             "$ref": "#/definitions/responses.SuccessFailureResponse"
                         }
                     }

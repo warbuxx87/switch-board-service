@@ -23,10 +23,10 @@ import (
 
 func connectToDatabase(config *util.Configuration) (*gorm.DB, error) {
 	// form a connectionURI: username:password@tcp(host:port)/databaseName?charset=utf8...
-	connectionUri := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
+	connectionURI := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local",
 		config.DatabaseUsername, config.DatabasePassword, config.DatabaseHost, 3306, config.DatabaseName)
-	logrus.Info("Connecting to ", connectionUri)
-	database, databaseError := gorm.Open("mysql", connectionUri)
+	logrus.Info("Connecting to ", connectionURI)
+	database, databaseError := gorm.Open("mysql", connectionURI)
 	if databaseError != nil {
 		return nil, databaseError
 	}
@@ -52,9 +52,9 @@ func init() {
 // @version 1.0
 // @description This service manages the authorization for exchanges and trade pairs
 
-// @contact.name Raynaldo Rivera
-// @contact.url https://alkemi.ai
-// @contact.email royal@alkemi.ai
+// @contact.name Alkemi
+// @contact.url https://alkemi.network
+// @contact.email dev@alkemi.ai
 
 // @license.name Proprietary
 // @license.url
@@ -63,7 +63,7 @@ func init() {
 // @in header
 // @name Authorization
 
-// @host 127.0.0.1:7020
+// @host switchboard-api.alkemi.tech
 // @BasePath /
 
 func main() {
@@ -102,7 +102,7 @@ func main() {
 
 	databaseConnection, databaseError := connectToDatabase(config)
 	if databaseError != nil {
-		logrus.Errorf("failed to connect to database; %v", databaseError, nil)
+		logrus.Errorf("failed to connect to database; %v", databaseError)
 		sentry.CaptureException(databaseError)
 		os.Exit(1)
 	} else {
