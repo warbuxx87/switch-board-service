@@ -19,10 +19,19 @@ pipelines:
   branches:
     master:
       - step:
-          name:                        "Build and Test"
+          name:                        "Test, Build, Upload"
           deployment:                  test
           script:
-            - echo "Build, Upload and Test!"
+            - echo "Test & Build"
+            - set -ex && apk add --no-cache gcc musl-dev git mercurial zip openssh
+            - apk update && apk add --no-cache ca-certificates
+            - git config --global url."git@bitbucket.org:".insteadOf "https://bitbucket.org/"
+            - go get -v
+            - go mod vendor
+            - go test -v -mod=vendor cmd/switch-board-service/main.go
+            - cd cmd/switch-board-service && CGO_ENABLED=1 GOOS=linux go build -v -mod=vendor -o switch-board-service -a -installsuffix cgo -ldflags '-w'
+            - echo "Uploading Build to AWS"
+            - cd $BITBUCKET_CLONE_DIR
             - zip -r application.zip .
             - pipe:                    atlassian/aws-elasticbeanstalk-deploy:0.2.3
               variables:
