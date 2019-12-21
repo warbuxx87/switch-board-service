@@ -1,9 +1,9 @@
-image:                               golang:1.12.6-alpine
+image:                                 golang:1.12.6-alpine
 
 pipelines:
   default:
     - step:
-        name:                        "Push Documentation to Github"
+        name:                          "Push Documentation to Github"
         script:
           - echo "Update Documentation"
           - cd $BITBUCKET_CLONE_DIR
@@ -29,8 +29,8 @@ pipelines:
           - echo $COMMIT_MSG
           - git add . && git commit -m "$COMMIT_MSG" && git push
     - step:
-        name:                        "Test & Build"
-        deployment:                  test
+        name:                          "Test & Build"
+        deployment:                    test
         script:
           - echo "Test & Build"
           - set -ex && apk add --no-cache gcc musl-dev git mercurial zip openssh
@@ -41,53 +41,53 @@ pipelines:
           - go test -v -mod=vendor cmd/switch-board-service/main.go
           - cd cmd/switch-board-service && CGO_ENABLED=1 GOOS=linux go build -v -mod=vendor -o switch-board-service -a -installsuffix cgo -ldflags '-w'
 
-pipelines:
-  default:
-    - step:
-        name:                        "Build and Test"
-        deployment:                  test
-        script:
-          - echo "Build, Upload and Test!"
-          - zip -r application.zip .
-          - pipe:                    atlassian/aws-elasticbeanstalk-deploy:0.2.3
+  branches:
+    master:
+      - step:
+          name:                        "Build and Test"
+          deployment:                  test
+          script:
+            - echo "Build, Upload and Test!"
+            - zip -r application.zip .
+            - pipe:                    atlassian/aws-elasticbeanstalk-deploy:0.2.3
+              variables:
+                AWS_ACCESS_KEY_ID:     $AWS_ACCESS_KEY_ID
+                AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+                AWS_DEFAULT_REGION:    $AWS_DEFAULT_REGION
+                APPLICATION_NAME:      'switch-board-service'
+                COMMAND:               'upload-only'
+                ZIP_FILE:              'application.zip'
+                VERSION_LABEL:         'switch-board-service-$BITBUCKET_BUILD_NUMBER'
+          artifacts:
+          - docker-multicontainer-v2.zip
+      - step:
+          name:                        "Deploy to Staging"
+          deployment:                  staging
+          script:
+          - echo "Deployment to Staging!"
+          - pipe:                      atlassian/aws-elasticbeanstalk-deploy:0.2.3
             variables:
-              AWS_ACCESS_KEY_ID:     $AWS_ACCESS_KEY_ID
-              AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-              AWS_DEFAULT_REGION:    $AWS_DEFAULT_REGION
-              APPLICATION_NAME:      'switch-board-service'
-              COMMAND:               'upload-only'
-              ZIP_FILE:              'application.zip'
-              VERSION_LABEL:         'switch-board-service-$BITBUCKET_BUILD_NUMBER'
-        artifacts:
-        - docker-multicontainer-v2.zip
-    - step:
-        name:                        "Deploy to Staging"
-        deployment:                  staging
-        script:
-        - echo "Deployment to Staging!"
-        - pipe:                      atlassian/aws-elasticbeanstalk-deploy:0.2.3
-          variables:
-            AWS_ACCESS_KEY_ID:       $AWS_ACCESS_KEY_ID
-            AWS_SECRET_ACCESS_KEY:   $AWS_SECRET_ACCESS_KEY
-            AWS_DEFAULT_REGION:      $AWS_DEFAULT_REGION
-            APPLICATION_NAME:        'switch-board-service'
-            COMMAND:                 'deploy-only'
-            VERSION_LABEL:           'switch-board-service-$BITBUCKET_BUILD_NUMBER'
-            ENVIRONMENT_NAME:        'switch-board-staging'
-            WAIT:                    'true'
-    - step:
-        name:                        "Deploy to Production"
-        deployment:                  production
-        trigger:                     manual
-        script:
-          - echo "Deployment to Production!"
-          - pipe:                    atlassian/aws-elasticbeanstalk-deploy:0.2.3
-            variables:
-              AWS_ACCESS_KEY_ID:     $AWS_ACCESS_KEY_ID
-              AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
-              AWS_DEFAULT_REGION:    $AWS_DEFAULT_REGION
-              APPLICATION_NAME:      'switch-board-service'
-              COMMAND:               'deploy-only'
-              VERSION_LABEL:         'switch-board-service-$BITBUCKET_BUILD_NUMBER'
-              ENVIRONMENT_NAME:      'switch-board-production'
-              WAIT:                  'true'
+              AWS_ACCESS_KEY_ID:       $AWS_ACCESS_KEY_ID
+              AWS_SECRET_ACCESS_KEY:   $AWS_SECRET_ACCESS_KEY
+              AWS_DEFAULT_REGION:      $AWS_DEFAULT_REGION
+              APPLICATION_NAME:        'switch-board-service'
+              COMMAND:                 'deploy-only'
+              VERSION_LABEL:           'switch-board-service-$BITBUCKET_BUILD_NUMBER'
+              ENVIRONMENT_NAME:        'switch-board-staging'
+              WAIT:                    'true'
+      - step:
+          name:                        "Deploy to Production"
+          deployment:                  production
+          trigger:                     manual
+          script:
+            - echo "Deployment to Production!"
+            - pipe:                    atlassian/aws-elasticbeanstalk-deploy:0.2.3
+              variables:
+                AWS_ACCESS_KEY_ID:     $AWS_ACCESS_KEY_ID
+                AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+                AWS_DEFAULT_REGION:    $AWS_DEFAULT_REGION
+                APPLICATION_NAME:      'switch-board-service'
+                COMMAND:               'deploy-only'
+                VERSION_LABEL:         'switch-board-service-$BITBUCKET_BUILD_NUMBER'
+                ENVIRONMENT_NAME:      'switch-board-production'
+                WAIT:                  'true'
