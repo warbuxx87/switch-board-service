@@ -13,7 +13,7 @@
         },
         "version": "1.0"
     },
-    "host": "https://switchboard-api.alkemi.tech",
+    "host": "switchboard-api.alkemi.tech",
     "basePath": "/",
     "paths": {
         "/v1/action/authorize_exchange": {

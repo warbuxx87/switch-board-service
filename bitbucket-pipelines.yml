@@ -57,6 +57,7 @@ pipelines:
               - go get -v
               - go mod vendor
               - go get -u github.com/swaggo/swag/cmd/swag
+              - rm -r docs/swagger/
               - swag init -g cmd/switch-board-service/main.go --output docs/swagger/
               - echo "Cloning Github api-docs"
               - cd .. && git clone git@github.com:project-alkemi/api-docs.git && cd api-docs
