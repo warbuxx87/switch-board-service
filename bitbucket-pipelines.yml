@@ -61,11 +61,11 @@ pipelines:
               - swag init -g cmd/switch-board-service/main.go --output docs/swagger/
               - echo "Cloning Github api-docs"
               - cd .. && git clone git@github.com:project-alkemi/api-docs.git && cd api-docs
-              - echo "Installing spectacle"
-              - npm install -g spectacle-docs
+              - echo "Installing ReDoc"
+              - npm install -g redoc-cli --unsafe-perm=true --allow-root
               - echo "Generating New Docs"
-              - rm -r switchboard-api
-              - spectacle -t switchboard-api $BITBUCKET_CLONE_DIR/docs/swagger/swagger.json
+              - redoc-cli bundle -o switchboard-service-api/index.html  $BITBUCKET_CLONE_DIR/docs/swagger/swagger.yaml
+              - echo "Generating New Docs"
               - echo "Pushing back to Github"
               - COMMIT_MSG="API Docs switch-board-service-$BITBUCKET_BUILD_NUMBER"
               - echo $COMMIT_MSG
