@@ -5,8 +5,8 @@ import (
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/models"
 	"bitbucket.org/project-alkemi/switch-board-service/internal/app/switch-board-service/util"
 	"encoding/gob"
-	"fmt"
 	"flag"
+	"fmt"
 	"github.com/getsentry/sentry-go"
 	"github.com/gorilla/sessions"
 	"github.com/jinzhu/gorm"
@@ -117,8 +117,17 @@ func main() {
 	dataContext.Database = databaseConnection
 	dataContext.Errors = &util.ErrorsStruct{}
 
+	// Echo instance
 	e := echo.New()
+
+	// Echo Debug On
 	e.Debug = true
+
+	// Set echo to serve static files from the assets folder
+	e.Static("/", "public")
+
+	// Serve Index.html for app home page calls
+	e.File("/", "public/index.html")
 
 	// Register our custom app context
 	e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
@@ -129,6 +138,7 @@ func main() {
 		}
 	})
 
+	// Middleware
 	e.Use(session.Middleware(sessions.NewCookieStore([]byte(uuid.NewV4().String()))))
 
 	e.Use(middleware.Logger())
