@@ -57,34 +57,34 @@ pipelines:
                 VERSION_LABEL:         'switch-board-service-$BITBUCKET_BUILD_NUMBER'
                 ENVIRONMENT_NAME:      'switch-board-service-staging'
                 WAIT:                  'true'
-            - step:
-                  name:                "Push Documentation to Github"
-                  trigger:             manual
-                  script:
-                    - echo "Update Documentation"
-                    - cd $BITBUCKET_CLONE_DIR
-                    - echo "Installing dependencies"
-                    - apk add --nocache --update gcc musl-dev nodejs npm git mercurial openssh
-                    - apk update && apk add --no-cache ca-certificates
-                    - git config --global url."git@bitbucket.org:".insteadOf "https://bitbucket.org/"
-                    - git config --global user.email "ryan@alkemi.ai"
-                    - echo "Generating API Docs"
-                    - go get -v
-                    - go mod vendor
-                    - go get -u github.com/swaggo/swag/cmd/swag
-                    - rm -r docs/swagger/
-                    - swag init -g cmd/switch-board-service/main.go --output docs/swagger/
-                    - echo "Cloning Github api-docs"
-                    - cd .. && git clone git@github.com:project-alkemi/api-docs.git && cd api-docs
-                    - echo "Installing ReDoc"
-                    - npm install -g redoc-cli --unsafe-perm=true --allow-root
-                    - echo "Generating New Docs"
-                    - redoc-cli bundle -o switchboard-service-api/index.html  $BITBUCKET_CLONE_DIR/docs/swagger/swagger.yaml
-                    - echo "Generating New Docs"
-                    - echo "Pushing back to Github"
-                    - COMMIT_MSG="API Docs switch-board-service-$BITBUCKET_BUILD_NUMBER"
-                    - echo $COMMIT_MSG
-                    - git add . && git commit -m "$COMMIT_MSG" && git push
+      - step:
+            name:                      "Push Documentation to Github"
+            trigger:                   manual
+            script:
+              - echo "Update Documentation"
+              - cd $BITBUCKET_CLONE_DIR
+              - echo "Installing dependencies"
+              - apk add --nocache --update gcc musl-dev nodejs npm git mercurial openssh
+              - apk update && apk add --no-cache ca-certificates
+              - git config --global url."git@bitbucket.org:".insteadOf "https://bitbucket.org/"
+              - git config --global user.email "ryan@alkemi.ai"
+              - echo "Generating API Docs"
+              - go get -v
+              - go mod vendor
+              - go get -u github.com/swaggo/swag/cmd/swag
+              - rm -r docs/swagger/
+              - swag init -g cmd/switch-board-service/main.go --output docs/swagger/
+              - echo "Cloning Github api-docs"
+              - cd .. && git clone git@github.com:project-alkemi/api-docs.git && cd api-docs
+              - echo "Installing ReDoc"
+              - npm install -g redoc-cli --unsafe-perm=true --allow-root
+              - echo "Generating New Docs"
+              - redoc-cli bundle -o switchboard-service-api/index.html  $BITBUCKET_CLONE_DIR/docs/swagger/swagger.yaml
+              - echo "Generating New Docs"
+              - echo "Pushing back to Github"
+              - COMMIT_MSG="API Docs switch-board-service-$BITBUCKET_BUILD_NUMBER"
+              - echo $COMMIT_MSG
+              - git add . && git commit -m "$COMMIT_MSG" && git push
       - step:
           name:                        "Deploy to Production"
           deployment:                  production
