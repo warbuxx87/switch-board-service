@@ -4,4 +4,4 @@ RUN mkdir /app
 COPY . /app
 WORKDIR /app
 EXPOSE 7020
-ENTRYPOINT [ "/app/cmd/switch-board-service/switch-board-service"]
+ENTRYPOINT [ "/app/cmd/switch-board-service/switch-board-service", "prod"]
