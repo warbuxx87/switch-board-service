@@ -1,7 +1,7 @@
 {
   "ListenIp": "127.0.0.1",
   "ListenPort": 7020,
-  "SentryUrl": "",
+  "SentryUrl": "https://0db609954a014f479060d66f6cc9e710@sentry.io/1871584",
   "DatabaseHost": "switchboard-db-staging.cwz6emzfnaqj.ca-central-1.rds.amazonaws.com",
   "DatabaseName": "switchboarddb",
   "DatabaseUsername": "admin",
