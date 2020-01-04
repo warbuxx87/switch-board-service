@@ -1,4 +1,4 @@
-# Build Insturctions
+# Build Instructions
 
 ## To build
 go build bitbucket.org/project-alkemi/switch-board-service/cmd/switch-board-service

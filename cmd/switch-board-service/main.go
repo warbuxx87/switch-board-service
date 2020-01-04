@@ -63,7 +63,7 @@ func init() {
 // @in header
 // @name Authorization
 
-// @host switchboard-api.alkemi.tech
+// @host 127.0.0.1:7020
 // @BasePath /
 
 func main() {
@@ -123,15 +123,8 @@ func main() {
 	// Echo Debug On
 	e.Debug = true
 
-	// Set echo to serve static files from the assets folder
-	e.Static("/", "public")
-
-	// Serve Index.html for app home page calls
-	e.File("/", "public/index.html")
-
 	// Register our custom app context
 	e.Use(func(h echo.HandlerFunc) echo.HandlerFunc {
-
 		return func(c echo.Context) error {
 			cc := &util.EndpointContext{Context: c, AppContext: &dataContext}
 			return h(cc)
@@ -150,7 +143,11 @@ func main() {
 		AllowMethods:     []string{echo.OPTIONS, echo.GET, echo.POST},
 	}))
 
+	// Set templates directory
 	templates := make(map[string]*template.Template)
+
+	// Serve Index.html for app home page calls
+	e.File("/", "public/index.html")
 
 	e.Renderer = &util.TemplateRegistry{
 		Templates: templates,
@@ -160,7 +157,9 @@ func main() {
 
 	e.HideBanner = true
 
-	// Public
+	// Public Routes
+	// Set echo to serve static files from the assets folder
+	e.Static("/", "public")
 	e.POST("/v1/login", api.LoginAction)
 	e.POST("/v1/generate_new_temp_token", api.GenerateNewTempTokenAction)
 	e.POST("/v1/revoke_temp_access_token", api.RevokeTempAccessTokenAction)
@@ -171,7 +170,7 @@ func main() {
 	e.POST("/v1/service/service_retrieve_all_exchanges", api.ServiceRetrieveAllExchangesAction)
 	e.POST("/v1/service/service_retrieve_all_trade_pairs", api.ServiceRetrieveAllTradePairsAction)
 
-	//Health
+	// Health
 	go api.ContinuousHealthCheck(&dataContext)
 	e.GET("/v1/health", api.HealthCheckAction)
 

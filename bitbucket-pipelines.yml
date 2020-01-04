@@ -73,6 +73,7 @@ pipelines:
         - step:
             name:                      "Deploy to Staging"
             deployment:                staging
+            trigger:                   manual
             script:
             - echo "Deployment to Staging!"
             - pipe:                    atlassian/aws-elasticbeanstalk-deploy:0.2.3
@@ -80,10 +81,10 @@ pipelines:
                 AWS_ACCESS_KEY_ID:     $AWS_ACCESS_KEY_ID
                 AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
                 AWS_DEFAULT_REGION:    $AWS_DEFAULT_REGION
-                APPLICATION_NAME:      'switch-board-service'
+                APPLICATION_NAME:      'switch-board'
                 COMMAND:               'deploy-only'
                 VERSION_LABEL:         'switch-board-service-$BITBUCKET_BUILD_NUMBER'
-                ENVIRONMENT_NAME:      'switch-board-staging'
+                ENVIRONMENT_NAME:      'switch-board-service-staging'
                 WAIT:                  'true'
       - step:
           name:                        "Deploy to Production"
@@ -96,8 +97,8 @@ pipelines:
                 AWS_ACCESS_KEY_ID:     $AWS_ACCESS_KEY_ID
                 AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
                 AWS_DEFAULT_REGION:    $AWS_DEFAULT_REGION
-                APPLICATION_NAME:      'switch-board-service'
+                APPLICATION_NAME:      'switch-board'
                 COMMAND:               'deploy-only'
                 VERSION_LABEL:         'switch-board-service-$BITBUCKET_BUILD_NUMBER'
-                ENVIRONMENT_NAME:      'switch-board-production'
+                ENVIRONMENT_NAME:      'switch-board-service'
                 WAIT:                  'true'
