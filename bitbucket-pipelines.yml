@@ -42,9 +42,9 @@ pipelines:
                 COMMAND:               'upload-only'
                 ZIP_FILE:              'application.zip'
                 VERSION_LABEL:         'switch-board-service-$BITBUCKET_BUILD_NUMBER'
-      - parallel:
-        - step:
+      - step:
             name:                      "Push Documentation to Github"
+            trigger:                   manual
             script:
               - echo "Update Documentation"
               - cd $BITBUCKET_CLONE_DIR
@@ -70,7 +70,7 @@ pipelines:
               - COMMIT_MSG="API Docs switch-board-service-$BITBUCKET_BUILD_NUMBER"
               - echo $COMMIT_MSG
               - git add . && git commit -m "$COMMIT_MSG" && git push
-        - step:
+      - step:
             name:                      "Deploy to Staging"
             deployment:                staging
             trigger:                   manual
