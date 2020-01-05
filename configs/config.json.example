@@ -1,6 +1,6 @@
 {
   "ListenIp": "127.0.0.1",
-  "ListenPort": 7020,
+  "ListenPort": 7010,
   "SentryUrl": "",
   "DatabaseUrl":"",
   "DatabaseName":"",

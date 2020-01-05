@@ -16,7 +16,7 @@ type Configuration struct {
 
 	SentryUrl string
 
-	DatabaseHost string
+	DatabaseHost     string
 	DatabaseName     string
 	DatabaseUsername string
 	DatabasePassword string
@@ -56,7 +56,7 @@ func LoadConfigurationFile(filename string) (*Configuration, error) {
 		return nil, dataReadError
 	}
 
-	jsonUnMarshalError := json.Unmarshal(data, &configuration);
+	jsonUnMarshalError := json.Unmarshal(data, &configuration)
 	if jsonUnMarshalError != nil {
 		return nil, jsonUnMarshalError
 	}
@@ -76,7 +76,7 @@ func HashPassword(password string) (string, error) {
 
 // verifyPassword will return nil if inputPassword is same as hashedPassword
 func VerifyPassword(inputPassword, hashedPassword string) error {
-	compareHashError := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(inputPassword));
+	compareHashError := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(inputPassword))
 	if compareHashError != nil {
 		return compareHashError
 	}
@@ -113,7 +113,7 @@ func generateDefaultConfig(filename string) error {
 func defaultConfig() *Configuration {
 	return &Configuration{
 		ListenIp:             "127.0.0.1",
-		ListenPort:           7020,
+		ListenPort:           7010,
 		SentryUrl:            "",
 		DatabaseName:         "db1",
 		DatabaseUsername:     "ubuntu",

@@ -16,7 +16,7 @@ services:
   switch-board-service:
     build:                 .
     ports:
-      - "7020:7020"
+      - "7010:7010"
     restart:               on-failure
     depends_on:
       - database

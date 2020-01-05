@@ -2,7 +2,6 @@ image:                                 golang:1.12.6-alpine
 
 pipelines:
   default:
-
     - step:
         name:                          "Test & Build"
         deployment:                    test
@@ -15,7 +14,6 @@ pipelines:
           - go mod vendor
           - go test -v -mod=vendor cmd/switch-board-service/main.go
           - cd cmd/switch-board-service && CGO_ENABLED=1 GOOS=linux go build -v -mod=vendor -o switch-board-service -a -installsuffix cgo -ldflags '-w'
-
   branches:
     master:
       - step:
