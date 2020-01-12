@@ -23,7 +23,7 @@ pipelines:
             - apk update && apk add --no-cache ca-certificates
             - echo "Updating Readme.md to Confluence Documentation"
             - curl -LO https://github.com/justmiles/go-markdown2confluence/releases/download/v3.0.2/markdown2confluence_3.0.2_linux_x86_64.tar.gz
-            - sudo tar -xzvf markdown2confluence_3.0.2_linux_x86_64.tar.gz -C /usr/local/bin/ markdown2confluence
+            - tar -xzvf markdown2confluence_3.0.2_linux_x86_64.tar.gz -C /usr/local/bin/ markdown2confluence
             - markdown2confluence --space 'Documents' --parent 'Arbitrage Service' --t 'Switchboard Service' --d README.md
     master:
       - step:
