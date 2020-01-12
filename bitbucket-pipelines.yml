@@ -14,17 +14,7 @@ pipelines:
           - go mod vendor
           - go test -v -mod=vendor cmd/switch-board-service/main.go
           - cd cmd/switch-board-service && CGO_ENABLED=1 GOOS=linux go build -v -mod=vendor -o switch-board-service -a -installsuffix cgo -ldflags '-w'
-  custom: # Pipelines that can only be triggered manually
-    confluence:
-      - step:
-          name: "README to Confluence"
-          script:
-            - set -ex && apk add --no-cache gcc musl-dev git mercurial zip openssh curl
-            - apk update && apk add --no-cache ca-certificates
-            - echo "Updating Readme.md to Confluence Documentation"
-            - curl -LO https://github.com/justmiles/go-markdown2confluence/releases/download/v3.0.2/markdown2confluence_3.0.2_linux_x86_64.tar.gz
-            - tar -xzvf markdown2confluence_3.0.2_linux_x86_64.tar.gz -C /usr/local/bin/ markdown2confluence
-            - markdown2confluence -u $CONFLUENCE_USER -p $CONFLUENCE_PASSWORD -e $CONFLUENCE_ENDPOINT -s 'ARCH' --parent 'Arbitrage Service' -t 'Switchboard Service' -d README.md
+  branches:
     master:
       - step:
           name:                        "Test, Build, Upload"
@@ -50,6 +40,15 @@ pipelines:
                 COMMAND:               'upload-only'
                 ZIP_FILE:              'application.zip'
                 VERSION_LABEL:         'switch-board-service-$BITBUCKET_BUILD_NUMBER'
+      - step:
+          name: "README to Confluence"
+          script:
+            - set -ex && apk add --no-cache gcc musl-dev git mercurial zip openssh curl
+            - apk update && apk add --no-cache ca-certificates
+            - echo "Updating Readme.md to Confluence Documentation"
+            - curl -LO https://github.com/justmiles/go-markdown2confluence/releases/download/v3.0.2/markdown2confluence_3.0.2_linux_x86_64.tar.gz
+            - tar -xzvf markdown2confluence_3.0.2_linux_x86_64.tar.gz -C /usr/local/bin/ markdown2confluence
+            - markdown2confluence -u $CONFLUENCE_USER -p $CONFLUENCE_PASSWORD -e $CONFLUENCE_ENDPOINT -s 'ARCH' --parent 'Arbitrage Service' -t 'Switchboard Service' -d README.md
       - step:
             name:                      "Deploy to Staging"
             deployment:                staging
