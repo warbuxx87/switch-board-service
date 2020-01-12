@@ -19,7 +19,7 @@ pipelines:
       - step:
           name: "README to Confluence"
           script:
-            - set -ex && apk add --no-cache gcc musl-dev git mercurial zip openssh
+            - set -ex && apk add --no-cache gcc musl-dev git mercurial zip openssh curl
             - apk update && apk add --no-cache ca-certificates
             - echo "Updating Readme.md to Confluence Documentation"
             - curl -LO https://github.com/justmiles/go-markdown2confluence/releases/download/v3.0.2/markdown2confluence_3.0.2_linux_x86_64.tar.gz
