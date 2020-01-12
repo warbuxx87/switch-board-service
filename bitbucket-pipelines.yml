@@ -17,14 +17,14 @@ pipelines:
   custom: # Pipelines that can only be triggered manually
     confluence:
       - step:
+          name: "README to Confluence"
           script:
+            - set -ex && apk add --no-cache gcc musl-dev git mercurial zip openssh
+            - apk update && apk add --no-cache ca-certificates
             - echo "Updating Readme.md to Confluence Documentation"
-            - pipe: zonkyio/confluence-sync
-              variables:
-                JIRA_USER: $JIRA_USER
-                JIRA_PASSWORD: $JIRA_PASSWORD
-                COMMAND: 'update-confluence README.md 65994893 "Autoupdate documentation from git repo"'
-  branches:
+            - curl -LO https://github.com/justmiles/go-markdown2confluence/releases/download/v3.0.2/markdown2confluence_3.0.2_linux_x86_64.tar.gz
+            - sudo tar -xzvf markdown2confluence_3.0.2_linux_x86_64.tar.gz -C /usr/local/bin/ markdown2confluence
+            - markdown2confluence --space 'Documents' --parent 'Arbitrage Service' --t 'Switchboard Service' --d README.md
     master:
       - step:
           name:                        "Test, Build, Upload"
