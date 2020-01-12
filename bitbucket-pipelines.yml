@@ -20,8 +20,10 @@ pipelines:
           script:
             - echo "Updating Readme.md to Confluence Documentation"
             - pipe: zonkyio/confluence-sync
-              script:
-                - update-confluence README.md 65994893 "Autoupdate documentation from git repo"
+              variables:
+                JIRA_USER: $JIRA_USER
+                JIRA_PASSWORD: $JIRA_PASSWORD
+                COMMAND: 'update-confluence README.md 65994893 "Autoupdate documentation from git repo"'
   branches:
     master:
       - step:
