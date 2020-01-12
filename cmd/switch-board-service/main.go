@@ -113,8 +113,13 @@ func main() {
 	// Create the data context
 	dataContext := util.DataContext{}
 
+	// Assign Config to Data Context
 	dataContext.Config = config
+
+	// Assign Database to dataContext
 	dataContext.Database = databaseConnection
+
+	// Assign Errors to dataContext
 	dataContext.Errors = &util.ErrorsStruct{}
 
 	// Echo instance
