@@ -14,6 +14,14 @@ pipelines:
           - go mod vendor
           - go test -v -mod=vendor cmd/switch-board-service/main.go
           - cd cmd/switch-board-service && CGO_ENABLED=1 GOOS=linux go build -v -mod=vendor -o switch-board-service -a -installsuffix cgo -ldflags '-w'
+  custom: # Pipelines that can only be triggered manually
+    confluence:
+      - step:
+          script:
+            - echo "Updating Readme.md to Confluence Documentation"
+            - pipe: zonkyio/confluence-sync
+              script:
+                - update-confluence README.md 65994893 "Autoupdate documentation from git repo"
   branches:
     master:
       - step:
