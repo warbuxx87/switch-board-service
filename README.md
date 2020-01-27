@@ -1,10 +1,6 @@
 # Alkemi | Switchboard Service
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![API](https://img.shields.io/website?down_color=red&down_message=offline&label=API&up_color=green&up_message=online&url=https%3A%2F%2Fswitchboard.alkemi.tech)
-[![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen.svg)](https://alkemi.atlassian.net/wiki/spaces/ARCH/pages/12648485/Switch+Board+Service)
-[![Twitter: AlkemiOfficial](https://img.shields.io/twitter/follow/AlkemiOfficial.svg?style=social)](https://twitter.com/AlkemiOfficial)
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) ![API](https://img.shields.io/website?down_color=red&down_message=offline&label=API&up_color=green&up_message=online&url=https%3A%2F%2Fswitchboard.alkemi.tech) [![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen.svg)](https://alkemi.atlassian.net/wiki/spaces/ARCH/pages/12648485/Switch+Board+Service) [![Twitter: AlkemiOfficial](https://img.shields.io/twitter/follow/AlkemiOfficial.svg?style=social)](https://twitter.com/AlkemiOfficial)
 
 ![Alkemi Switchboard Service](https://raw.githubusercontent.com/project-alkemi/api-docs/master/assets/img/switchboard.gif)
 
